@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KorepetycjeNaJuz.Configurations;
 using KorepetycjeNaJuz.Data;
 using KorepetycjeNaJuz.Data.Models;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +34,8 @@ namespace KorepetycjeNaJuz
                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             KorepetycjeContext.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
 
+            SwaggerConfiguration.RegisterService(services);
+
             //services.AddIdentity<Users, ApplicationRoles>()
             //    .AddEntityFrameworkStores<KorepetycjeContext>()
             //    .AddDefaultTokenProviders();
@@ -54,6 +57,8 @@ namespace KorepetycjeNaJuz
 
             app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseSwagger();
+            SwaggerConfiguration.RegisterUi(app);
         }
     }
 }
