@@ -53,6 +53,11 @@ namespace KorepetycjeNaJuz
             }
 
             app.UseHttpsRedirection();
+
+            using (KorepetycjeContext context = new KorepetycjeContext())
+            {
+                context.Database.Migrate();
+            }
             app.UseMvc();
         }
     }
