@@ -1,7 +1,7 @@
-﻿using KorepetycjeNaJuz.Data.Models;
+﻿using KorepetycjeNaJuz.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace KorepetycjeNaJuz.Data
+namespace KorepetycjeNaJuz.Infrastructure
 {
     public class KorepetycjeContext : DbContext
     {

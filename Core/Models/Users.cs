@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KorepetycjeNaJuz.Data.Models
+namespace KorepetycjeNaJuz.Core.Models
 {
-    public class Users
+    public class Users : Interfaces.IEntityWithTypedId<int>
     {
         [Key]
         public int Id { get; set; }

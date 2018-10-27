@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace KorepetycjeNaJuz.Data.Models
+namespace KorepetycjeNaJuz.Core.Models
 {
     public class Messages
     {
