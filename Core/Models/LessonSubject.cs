@@ -2,7 +2,7 @@
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class LessonSubjects
+    public class LessonSubject
     {
         [Key]
         public int Id { get; set; }

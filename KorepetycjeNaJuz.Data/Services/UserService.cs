@@ -7,13 +7,13 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepositoryWithTypedId<Users, int> _usersRepository;
-        public Users Authenticate( string username, string password )
+        private readonly IRepositoryWithTypedId<User, int> _usersRepository;
+        public User Authenticate( string username, string password )
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<Users> GetAll()
+        public IEnumerable<User> GetAll()
         {
             throw new NotImplementedException();
         }

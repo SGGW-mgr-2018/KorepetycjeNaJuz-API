@@ -2,12 +2,12 @@
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class LessonStatuses
+    public class LessonLevel
     {
         [Key]
         public int Id { get; set; }
 
-        [MaxLength(50)]
-        public string Name { get; set; }
+        [MaxLength(255)]
+        public string LevelName { get; set; }
     }
 }
