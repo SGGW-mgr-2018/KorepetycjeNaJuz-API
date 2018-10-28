@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using KorepetycjeNaJuz.Core.Models;
+using KorepetycjeNaJuz.Data.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KorepetycjeNaJuz.Controllers
@@ -10,11 +13,30 @@ namespace KorepetycjeNaJuz.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IMapper _mapper;
+
+        public ValuesController(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<UserDTO> Get()
         {
-            return new string[] { "value1", "value2" };
+            // AutoMapper simple example
+            var user = new User() {
+                Id = 1,
+                Description = "Example User",
+                Email = "user@example.com",
+                FirstName = "Janusz",
+                LastName = "Admin",
+                IsCoach = true,
+                Telephone = "656-233-222"
+            };
+            var userDTO = _mapper.Map<UserDTO>(user);
+
+            return userDTO;
         }
 
         // GET api/values/5
