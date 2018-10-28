@@ -2,13 +2,13 @@
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class CoachAddresses
+    public class CoachAddress
     {
         [Key]
         public int Id { get; set; }
 
         public int CoachId { get; set; }
-        public Users Coach { get; set; }
+        public User Coach { get; set; }
 
         public double? Latitude { get; set; }
 

@@ -2,22 +2,22 @@
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class Lessons
+    public class Lesson
     {
         [Key]
         public int Id { get; set; }
 
         public int LessonStatusId { get; set; }
-        public LessonStatuses LessonStatus { get; set; }
+        public LessonStatus LessonStatus { get; set; }
 
         public int CoachLessonId { get; set; }
-        public CoachLessons CoachLesson { get; set; }
+        public CoachLesson CoachLesson { get; set; }
 
         public int StudentId { get; set; }
-        public Users Student { get; set; }
+        public User Student { get; set; }
 
         public int CoachAddressId { get; set; }
-        public CoachAddresses CoachAddress { get; set; }
+        public CoachAddress CoachAddress { get; set; }
 
         public System.DateTime Date { get; set; }
 
