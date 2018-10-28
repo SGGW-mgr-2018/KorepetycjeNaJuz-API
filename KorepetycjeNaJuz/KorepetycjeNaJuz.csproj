@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <UserSecretsId>86847d92-b8e8-429e-bdb9-dec0e0e89f54</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,7 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KorepetycjeNaJuz.Data\KorepetycjeNaJuz.Data.csproj" />
+    <ProjectReference Include="..\Core\KorepetycjeNaJuz.Core.csproj" />
+    <ProjectReference Include="..\KorepetycjeNaJuz.Data\KorepetycjeNaJuz.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

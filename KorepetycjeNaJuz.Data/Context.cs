@@ -1,7 +1,7 @@
-﻿using KorepetycjeNaJuz.Data.Models;
+﻿using KorepetycjeNaJuz.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace KorepetycjeNaJuz.Data
+namespace KorepetycjeNaJuz.Infrastructure
 {
     public class KorepetycjeContext : DbContext
     {
@@ -21,14 +21,14 @@ namespace KorepetycjeNaJuz.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<CoachAddresses>().ToTable("CoachAddresses");
-            builder.Entity<CoachLessons>().ToTable("CoachLessons");
-            builder.Entity<LessonLevels>().ToTable("LessonLevels");
-            builder.Entity<Lessons>().ToTable("Lessons");
-            builder.Entity<LessonStatuses>().ToTable("LessonStatuses");
-            builder.Entity<LessonSubjects>().ToTable("LessonSubjects");
-            builder.Entity<Messages>().ToTable("Messages");
-            builder.Entity<Users>().ToTable("Users");
+            builder.Entity<CoachAddress>().ToTable("CoachAddresses");
+            builder.Entity<CoachLesson>().ToTable("CoachLessons");
+            builder.Entity<LessonLevel>().ToTable("LessonLevels");
+            builder.Entity<Lesson>().ToTable("Lessons");
+            builder.Entity<LessonStatus>().ToTable("LessonStatuses");
+            builder.Entity<LessonSubject>().ToTable("LessonSubjects");
+            builder.Entity<Message>().ToTable("Messages");
+            builder.Entity<User>().ToTable("Users");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -36,13 +36,13 @@ namespace KorepetycjeNaJuz.Data
             optionsBuilder.UseSqlServer(ConnectionString);
         }
 
-        public DbSet<CoachAddresses> CoachAddresses { get; set; }
-        public DbSet<CoachLessons> CoachLessons { get; set; }
-        public DbSet<LessonLevels> LessonLevels { get; set; }
-        public DbSet<Lessons> Lessons { get; set; }
-        public DbSet<LessonStatuses> LessonStatuses { get; set; }
-        public DbSet<LessonSubjects> LessonSubjects { get; set; }
-        public DbSet<Messages> Messages { get; set; }
-        public DbSet<Users> Users { get; set; }
+        public DbSet<CoachAddress> CoachAddresses { get; set; }
+        public DbSet<CoachLesson> CoachLessons { get; set; }
+        public DbSet<LessonLevel> LessonLevels { get; set; }
+        public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<LessonStatus> LessonStatuses { get; set; }
+        public DbSet<LessonSubject> LessonSubjects { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

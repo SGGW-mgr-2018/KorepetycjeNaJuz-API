@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KorepetycjeNaJuz.Data.Models
+namespace KorepetycjeNaJuz.Core.Models
 {
-    public class LessonLevels
+    public class LessonLevel
     {
         [Key]
         public int Id { get; set; }

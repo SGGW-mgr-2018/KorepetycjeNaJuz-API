@@ -1,20 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KorepetycjeNaJuz.Data.Models
+namespace KorepetycjeNaJuz.Core.Models
 {
-    public class CoachLessons
+    public class CoachLesson
     {
         [Key]
         public int Id { get; set; }
 
         public int CoachId { get; set; }
-        public Users Coach { get; set; }
+        public User Coach { get; set; }
 
         public int LessonSubjectId { get; set; }
-        public LessonSubjects Subject { get; set; }
+        public LessonSubject Subject { get; set; }
 
         public int LessonLevelId { get; set; }
-        public LessonLevels LessonLevel { get; set; }
+        public LessonLevel LessonLevel { get; set; }
 
         public decimal RatePerHour { get; set; }
     }
