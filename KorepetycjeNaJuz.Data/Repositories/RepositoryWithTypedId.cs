@@ -23,10 +23,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             return result;
         }
 
-        public virtual Task AddAsync( T entity )
+        public virtual Task<T> AddAsync( T entity )
         {
-            this._dbContext.Add( entity );
-            return this._dbContext.SaveChangesAsync();
+            T result = this._dbContext.Add( entity ).Entity;
+            this._dbContext.SaveChangesAsync();
+            return Task.FromResult(result);
         }
 
         public virtual void Delete( T entity )
