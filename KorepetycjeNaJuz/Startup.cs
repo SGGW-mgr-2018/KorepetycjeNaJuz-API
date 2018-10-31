@@ -30,6 +30,7 @@ namespace KorepetycjeNaJuz
                     options.UseSqlServer( this.Configuration.GetConnectionString( "DefaultConnection" ) ) );
             KorepetycjeContext.ConnectionString = this.Configuration.GetConnectionString( "DefaultConnection" );
             services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<Lesson, int>, LessonRepository>();
+            services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<User, int>, GenericRepository<User>>();
 
             SwaggerConfiguration.RegisterService( services );
 
