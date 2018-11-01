@@ -17,8 +17,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Auth
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             ClaimsIdentity identity = new ClaimsIdentity(
-                new GenericIdentity( userName, "TokenAuth" ),
-                new[] { new Claim( "UserId", userId, ClaimValueTypes.String ) }
+                new GenericIdentity(userName, "TokenAuth"),
+                new[] { new Claim("UserId", userId, ClaimValueTypes.String) }
                 );
 
             Microsoft.IdentityModel.Tokens.SecurityToken securityToken = handler.CreateToken(
@@ -28,8 +28,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Auth
                     Audience = this._tokenAuthOptions.Audience,
                     SigningCredentials = this._tokenAuthOptions.SigningCredentials,
                     Subject = identity,
-                    Expires = DateTime.UtcNow.Add( this._tokenAuthOptions.LifeSpan )
-                } );
+                    Expires = DateTime.UtcNow.Add(this._tokenAuthOptions.LifeSpan)
+                });
 
             return handler.WriteToken(securityToken);
         }
