@@ -3,6 +3,7 @@ using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
+using System.Collections.Generic;
 
 namespace KorepetycjeNaJuz.Configurations
 {
@@ -28,6 +29,10 @@ namespace KorepetycjeNaJuz.Configurations
                     Name = ApiKeySchemeName,
                     In = ApiKeySchemeIn,
                     Type = ApiKeySchemeType
+                });
+                c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
+                {
+                    { "Bearer", new string[] { } }
                 });
 
                 c.DescribeAllEnumsAsStrings();
