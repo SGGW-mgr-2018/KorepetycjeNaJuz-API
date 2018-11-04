@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Data.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KorepetycjeNaJuz.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize("Bearer")]
     public class ValuesController : ControllerBase
     {
         private readonly IMapper _mapper;
 
         public ValuesController(IMapper mapper)
         {
-            _mapper = mapper;
+            this._mapper = mapper;
         }
 
         // GET api/values
@@ -25,7 +23,8 @@ namespace KorepetycjeNaJuz.Controllers
         public ActionResult<UserDTO> Get()
         {
             // AutoMapper simple example
-            var user = new User() {
+            User user = new User()
+            {
                 Id = 1,
                 Description = "Example User",
                 Email = "user@example.com",
@@ -34,7 +33,7 @@ namespace KorepetycjeNaJuz.Controllers
                 IsCoach = true,
                 Telephone = "656-233-222"
             };
-            var userDTO = _mapper.Map<UserDTO>(user);
+            UserDTO userDTO = this._mapper.Map<UserDTO>(user);
 
             return userDTO;
         }
