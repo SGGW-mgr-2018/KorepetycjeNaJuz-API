@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class User : Interfaces.IEntityWithTypedId<int>
+    public class User : IdentityUser<int>, Interfaces.IEntityWithTypedId<int>
     {
         [Key]
-        public int Id { get; set; }
+        public override int Id { get; set; }
 
         [MaxLength(255)]
         public string FirstName { get; set; }
@@ -14,7 +15,7 @@ namespace KorepetycjeNaJuz.Core.Models
         public string LastName { get; set; }
 
         [MaxLength(255)]
-        public string Email { get; set; }
+        public override string Email { get; set; }
 
         [Phone]
         [MaxLength(15)]
