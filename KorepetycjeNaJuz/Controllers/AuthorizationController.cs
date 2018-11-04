@@ -4,6 +4,7 @@ using KorepetycjeNaJuz.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
@@ -26,16 +27,15 @@ namespace KorepetycjeNaJuz.Controllers
         }
 
         /// <summary>
-        /// Asynchroniczna metoda logująca. Dla poprawnych danych logowania, zwracany jest kod 200 oraz token typu JWT.
-        /// Kody błędu: 400 Bad Request (Niepoprawne dane logowania); 403 Forbidden (konto zablokowane)
+        /// Asynchroniczna metoda logująca.
         /// </summary>
-        /// <param name="userLoginDto"></param>
-        /// <returns>
-        /// Kody: 200 OK, 400 Bad Request (Złe dane logowania), 403 Forbidden (konto zablokowane)
-        /// Dla kodu 200 OK: dodatkowo token JWT
-        /// </returns>
+        /// <param name="userLoginDto">Dane logowania</param>
+        /// <returns>Wygenerowany token JWT</returns>
+        /// <response code="200">Pomyślna autoryzacja użytkownika - zwraca wygenerowany JWT Token</response>
+        /// <response code="400">Logowanie nie powiodło się - niepoprawne dane logowania</response>
+        /// <response code="403">Konto użytkownika jest zablokowane</response>
         [HttpPost( "Login" ), AllowAnonymous]        
-        public async Task<IActionResult> LoginUserAsync(UserLoginDTO userLoginDto)
+        public async Task<IActionResult> LoginUserAsync([Required] UserLoginDTO userLoginDto)
         {
 
             SignInResult result = await this._signInManager.PasswordSignInAsync( userLoginDto.Username, userLoginDto.Password, false, false );
