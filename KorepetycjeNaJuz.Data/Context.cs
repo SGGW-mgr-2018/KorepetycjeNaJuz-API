@@ -1,9 +1,11 @@
 ﻿using KorepetycjeNaJuz.Core.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace KorepetycjeNaJuz.Infrastructure
 {
-    public class KorepetycjeContext : DbContext
+    public class KorepetycjeContext : IdentityDbContext<User,IdentityRole<int>,int>
     {
         public static string ConnectionString { get; set; }
 
