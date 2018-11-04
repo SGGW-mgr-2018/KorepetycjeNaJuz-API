@@ -53,7 +53,12 @@ namespace KorepetycjeNaJuz
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if(env.IsDevelopment())
+            using (KorepetycjeContext context = new KorepetycjeContext())
+            {
+                context.Database.Migrate();
+            }
+
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 DatabaseSeed.Initialize(app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider);
@@ -66,11 +71,6 @@ namespace KorepetycjeNaJuz
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
-
-            using(KorepetycjeContext context = new KorepetycjeContext())
-            {
-                context.Database.Migrate();
-            }
 
             app.UseMvc();
 
