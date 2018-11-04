@@ -25,14 +25,23 @@ namespace KorepetycjeNaJuz.Controllers
             this._oAuthService = oAuthService;
         }
 
-        [HttpPost( "Login" ), AllowAnonymous]
+        /// <summary>
+        /// Asynchroniczna metoda logująca. Dla poprawnych danych logowania, zwracany jest kod 200 oraz token typu JWT.
+        /// Kody błędu: 400 Bad Request (Niepoprawne dane logowania); 403 Forbidden (konto zablokowane)
+        /// </summary>
+        /// <param name="userLoginDto"></param>
+        /// <returns>
+        /// Kody: 200 OK, 400 Bad Request (Złe dane logowania), 403 Forbidden (konto zablokowane)
+        /// Dla kodu 200 OK: dodatkowo token JWT
+        /// </returns>
+        [HttpPost( "Login" ), AllowAnonymous]        
         public async Task<IActionResult> LoginUserAsync(UserLoginDTO userLoginDto)
         {
 
             SignInResult result = await this._signInManager.PasswordSignInAsync( userLoginDto.Username, userLoginDto.Password, false, false );
             if(result.IsLockedOut)
             {
-                return BadRequest( "User Account is locked out!" );
+                return Forbid( "User Account is locked out!" );
             }
             if(!result.Succeeded)
             {
