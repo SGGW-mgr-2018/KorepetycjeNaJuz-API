@@ -10,9 +10,9 @@ namespace KorepetycjeNaJuz.Core.Models
         public int CoachId { get; set; }
         public User Coach { get; set; }
 
-        public double? Latitude { get; set; }
+        public double Latitude { get; set; }
 
-        public double? Longitude { get; set; }
+        public double Longitude { get; set; }
 
         [MaxLength(1000)]
         public string Address { get; set; }

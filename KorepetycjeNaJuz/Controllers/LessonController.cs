@@ -126,6 +126,44 @@ namespace KorepetycjeNaJuz.Controllers
             return queryable.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, queryable);
         }
 
+        [HttpGet]
+        [Route("LessionsByPosition/{latitiude}/{longitiude}/{radius}/{subjectId}/{levelId}")]
+        public IActionResult LessionsByPosition(double latitiude, double longitiude, double radius, int subjectId, int levelId)
+        {
+            double distance(double lat1, double lon1, double lat2, double lon2)
+            {
+                double theta = lon1 - lon2;
+                double dist = Math.Sin(deg2rad(lat1)) * Math.Sin(deg2rad(lat2)) + Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) * Math.Cos(deg2rad(theta));
+                dist = Math.Acos(dist);
+                dist = rad2deg(dist);
+                dist = dist * 60 * 1.1515;
+                dist = dist * 1.609344; // to kilomiters
+                return (dist);
+            }
+            double deg2rad(double deg)
+            {
+                return (deg * Math.PI / 180.0);
+            }
+            double rad2deg(double rad)
+            {
+                return (rad / Math.PI * 180.0);
+            }
+
+            var query = _repository.ListAll();
+            List<Lesson> output = new List<Lesson>();
+            foreach (Lesson lesson in query)
+            {
+                if (    distance(lesson.CoachAddress.Latitude, lesson.CoachAddress.Longitude,latitiude,longitiude) <= radius && 
+                        lesson.CoachLesson.LessonSubjectId == subjectId && 
+                        lesson.CoachLesson.LessonLevelId == levelId)
+                {
+                    output.Add(lesson);
+                }
+            }
+            return output.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, output);
+        }
+        
+
         [HttpPost]
         [Route("Update")]
         public IActionResult Update([FromBody] Lesson lesson)
