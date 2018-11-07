@@ -3,6 +3,7 @@ using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Data.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -12,16 +13,19 @@ namespace KorepetycjeNaJuz.Controllers
     public class ValuesController : ControllerBase
     {
         private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
         public ValuesController(IMapper mapper)
         {
             this._mapper = mapper;
+            this._logger = LogManager.GetLogger("apiLogger");
         }
 
         // GET api/values
         [HttpGet]
         public ActionResult<UserDTO> Get()
         {
+            _logger.Info("Simple example of logger");
             // AutoMapper simple example
             User user = new User()
             {
