@@ -14,10 +14,10 @@ namespace KorepetycjeNaJuz.Core.Models
 
         public double? Longitude { get; set; }
 
-        [MaxLength(1000)]
+        [MaxLength(100)]
         public string City { get; set; }
 
-        [MaxLength(100)]
+        [MaxLength(250)]
         public string Street { get; set; }
     }
 }
