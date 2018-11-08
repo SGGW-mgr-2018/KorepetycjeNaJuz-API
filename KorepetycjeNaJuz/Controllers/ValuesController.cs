@@ -34,7 +34,6 @@ namespace KorepetycjeNaJuz.Controllers
                 Email = "user@example.com",
                 FirstName = "Janusz",
                 LastName = "Admin",
-                IsCoach = true,
                 Telephone = "656-233-222"
             };
             UserDTO userDTO = this._mapper.Map<UserDTO>(user);
