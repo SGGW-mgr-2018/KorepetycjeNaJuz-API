@@ -27,7 +27,6 @@ namespace KorepetycjeNaJuz.Infrastructure
                     Description = "Example User",
                     FirstName = "Janusz",
                     LastName = "Admin",
-                    IsCoach = true,
                     Telephone = "656-233-222"
 
                 };
