@@ -2,7 +2,7 @@
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class CoachAddress
+    public class Address
     {
         [Key]
         public int Id { get; set; }
@@ -14,7 +14,10 @@ namespace KorepetycjeNaJuz.Core.Models
 
         public double? Longitude { get; set; }
 
-        [MaxLength(1000)]
-        public string Address { get; set; }
+        [MaxLength(100)]
+        public string City { get; set; }
+
+        [MaxLength(250)]
+        public string Street { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using KorepetycjeNaJuz.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KorepetycjeNaJuz.Data.Migrations
 {
     [DbContext(typeof(KorepetycjeContext))]
-    partial class KorepetycjeContextModelSnapshot : ModelSnapshot
+    [Migration("20181108211005_UpdateDatabaseSchema")]
+    partial class UpdateDatabaseSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
