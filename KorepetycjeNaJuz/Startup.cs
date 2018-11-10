@@ -1,9 +1,8 @@
-using AutoMapper;
+﻿using AutoMapper;
 using KorepetycjeNaJuz.Configurations;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
-using KorepetycjeNaJuz.Infrastructure.Repositories;
 using KorepetycjeNaJuz.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -35,8 +34,6 @@ namespace KorepetycjeNaJuz
             services.AddDbContext<KorepetycjeContext>( options =>
                     options.UseSqlServer( this.Configuration.GetConnectionString( "DefaultConnection" ) ) );
             KorepetycjeContext.ConnectionString = this.Configuration.GetConnectionString( "DefaultConnection" );
-            services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<Lesson, int>, LessonRepository>();
-            services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<User, int>, GenericRepository<User>>();
 
             SwaggerConfiguration.RegisterService( services );
 
