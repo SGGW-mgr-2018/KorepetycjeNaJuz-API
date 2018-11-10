@@ -11,7 +11,7 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         Task<List<T>> ListAllAsync();
         IEnumerable<T> ListAll();
         T Add( T entity );
-        Task<T> AddAsync( T entity );
+        Task AddAsync( T entity );
         void Update( T entity );
         Task UpdateAsync( T entity );
         void Delete( T entity );
