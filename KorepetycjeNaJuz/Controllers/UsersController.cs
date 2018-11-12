@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
 
@@ -81,23 +82,22 @@ namespace KorepetycjeNaJuz.Controllers
             if (id != user.Id)
                 return BadRequest();
 
-            bool _userExists = UserExists(id);
-            User _userTmp;
-
-            if (!_userExists) return NotFound();
+            if (!UserExists(id)) return NotFound();
             else
             { // Logic
-                _userTmp = _context.Users.Find(id);
-                if (user.Email != _userTmp.Email)
+                PropertyValues _oldVals = _context.Entry(user).GetDatabaseValues();
+                string _oldEmail = _oldVals.GetValue<string>("Email");
+                string _oldPhoneNumber = _oldVals.GetValue<string>("PhoneNumber");
+
+                if (user.Email != _oldEmail)
                     user.EmailConfirmed = false;
                 else
                     user.EmailConfirmed = true;
-                if (user.PhoneNumber != _userTmp.PhoneNumber)
+                if (user.PhoneNumber != _oldPhoneNumber)
                     user.PhoneNumberConfirmed = false;
                 else
                     user.PhoneNumberConfirmed = true;
             }
-
             _context.Entry(user).State = EntityState.Modified;
 
             try { await _context.SaveChangesAsync(); }
@@ -108,7 +108,7 @@ namespace KorepetycjeNaJuz.Controllers
                 return StatusCode(304, uce.Message);
             }
 
-            _logger.Info(string.Format("User {0} {1} has been modified.", _userTmp.FirstName, _userTmp.LastName));
+            _logger.Info(string.Format("User with id={0} has been modified.", id));
 
             return NoContent();
         }
