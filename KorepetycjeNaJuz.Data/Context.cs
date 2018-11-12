@@ -35,7 +35,9 @@ namespace KorepetycjeNaJuz.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(ConnectionString);
         }
 
         public DbSet<Address> CoachAddresses { get; set; }
