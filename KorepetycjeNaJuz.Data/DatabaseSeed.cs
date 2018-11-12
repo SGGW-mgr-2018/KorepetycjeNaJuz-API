@@ -1,4 +1,5 @@
-﻿using KorepetycjeNaJuz.Core.Models;
+﻿using KorepetycjeNaJuz.Core.Enums;
+using KorepetycjeNaJuz.Core.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,6 +14,8 @@ namespace KorepetycjeNaJuz.Infrastructure
             KorepetycjeContext context = serviceProvider.GetRequiredService<KorepetycjeContext>();
             UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             context.Database.EnsureCreated();
+
+            InitializeLessonStatuses(context);
 
             if(!context.Users.Any())
             {
@@ -33,10 +36,25 @@ namespace KorepetycjeNaJuz.Infrastructure
                 System.Threading.Tasks.Task<IdentityResult> result = userManager.CreateAsync( user, "Password@123" );
                 result.Wait();
                 Console.WriteLine(result.Result.Succeeded);
-
-
             }
+        }
 
+        private static void InitializeLessonStatuses(KorepetycjeContext context)
+        {
+            if (context.LessonStatuses.Any())
+                return;
+
+            var lessonStatusesIds = Enum.GetValues(typeof(LessonStatuses)).Cast<int>().ToList();
+            foreach (var statusId in lessonStatusesIds)
+            {
+                var statusName = ((LessonStatuses)statusId).ToString();
+                var lessonStatus = new LessonStatus
+                {
+                    Name = statusName
+                };
+                context.LessonStatuses.Add(lessonStatus);
+            }
+            context.SaveChanges();
         }
     }
 }
