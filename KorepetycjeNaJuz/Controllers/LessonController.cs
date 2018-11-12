@@ -71,7 +71,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.CreateLessonAsync(lessonCreateDTO);
+                await _lessonService.CreateLessonAsync(lessonCreateDTO);
             }
             catch (Exception ex)
             {
