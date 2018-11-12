@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System;
 using NLog;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -38,7 +39,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="404">Podana lekcja nie istnieje</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
         [HttpPost, Route("Create"), Authorize("Bearer")]
-        public IActionResult CreateLesson([Required, FromBody] LessonCreateDTO lessonCreateDTO)
+        public async Task<IActionResult> CreateLesson([Required, FromBody] LessonCreateDTO lessonCreateDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -70,7 +71,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.CreateLesson(lessonCreateDTO);
+                _lessonService.CreateLessonAsync(lessonCreateDTO);
             }
             catch (Exception ex)
             {

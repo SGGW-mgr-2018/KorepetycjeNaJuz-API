@@ -1,10 +1,11 @@
 ﻿using KorepetycjeNaJuz.Core.DTO;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Core.Interfaces
 {
     public interface ILessonService
     {
-        void CreateLesson(LessonCreateDTO lessonCreateDTO);
+        Task CreateLessonAsync(LessonCreateDTO lessonCreateDTO);
         bool IsLessonExists(int lessonId);
     }
 }

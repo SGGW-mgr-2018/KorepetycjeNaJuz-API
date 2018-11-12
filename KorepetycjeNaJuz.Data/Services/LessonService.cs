@@ -3,6 +3,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
 {
@@ -22,18 +23,18 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             this._mapper = mapper;
         }
 
-        public void CreateLesson(LessonCreateDTO lessonCreateDTO)
+        public async Task CreateLessonAsync(LessonCreateDTO lessonCreateDTO)
         {
             var lesson = _mapper.Map<Lesson>(lessonCreateDTO);
-            var coachLesson = _coachLessonRepository.GetById(lessonCreateDTO.CoachLessonId);
+            var coachLesson = await _coachLessonRepository.GetByIdAsync(lessonCreateDTO.CoachLessonId);
 
             lesson.Date = coachLesson.DateEnd;
             lesson.NumberOfHours = (coachLesson.DateEnd - coachLesson.DateStart).Hours;
             lesson.LessonStatusId = (int)LessonStatuses.WaitingToApprove;
-            _lessonRepository.Add(lesson);
+            await _lessonRepository.AddAsync(lesson);
 
             coachLesson.LessonStatusId = (int)LessonStatuses.Reserved;
-            _coachLessonRepository.Update(coachLesson);
+            await _coachLessonRepository.UpdateAsync(coachLesson);
         }
 
         public bool IsLessonExists(int lessonId)
