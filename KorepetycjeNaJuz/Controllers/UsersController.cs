@@ -14,7 +14,7 @@ namespace KorepetycjeNaJuz.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize("Bearer")]
+    [Authorize("Bearer")]
     public class UsersController : ControllerBase
     {
         private readonly ILogger _logger;
