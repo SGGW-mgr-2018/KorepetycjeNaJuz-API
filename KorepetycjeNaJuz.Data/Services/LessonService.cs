@@ -30,8 +30,10 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             lesson.Date = coachLesson.DateEnd;
             lesson.NumberOfHours = (coachLesson.DateEnd - coachLesson.DateStart).Hours;
             lesson.LessonStatusId = (int)LessonStatuses.WaitingToApprove;
-
             _lessonRepository.Add(lesson);
+
+            coachLesson.LessonStatusId = (int)LessonStatuses.Reserved;
+            _coachLessonRepository.Update(coachLesson);
         }
 
         public bool IsLessonExists(int lessonId)

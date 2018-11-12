@@ -27,24 +27,44 @@ namespace KorepetycjeNaJuz.Controllers
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
-        [HttpPost, Route("add"), Authorize("Bearer")]
+        /// <summary>
+        /// Zapisuje zalogowanego użytkownika na zadaną lekcję
+        /// </summary>
+        /// <param name="lessonCreateDTO"></param>
+        /// <returns></returns>
+        /// <response code="201">Poprawnie zapisano na lekcję</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
+        [HttpPost, Route("Create"), Authorize("Bearer")]
         public IActionResult CreateLesson([Required, FromBody] LessonCreateDTO lessonCreateDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (!_coachLessonService.IsCoachLessonExists(lessonCreateDTO.CoachLessonId))
+            var currentUserId = this.User.GetUserId().Value;
+            var coachLessonId = lessonCreateDTO.CoachLessonId;
+            lessonCreateDTO.StudentId = currentUserId;
+            
+            // Custom Validation 
+            if (!_coachLessonService.IsCoachLessonExists(coachLessonId))
             {
-                ModelState.AddModelError("CoachLessonId", "Lekcja na którą chcesz się zapisać nie istnieje.");
+                return NotFound();
+            }
+            if (_coachLessonService.IsUserOwnerOfCoachLesson(coachLessonId, currentUserId))
+            {
+                ModelState.AddModelError("CoachLessonId", "Nie można zapisać się na swoją lekcję.");
                 return BadRequest(ModelState);
             }
-
-            var currentUserId = this.User.GetUserId();
-            lessonCreateDTO.StudentId = currentUserId.Value;
-
-            if (currentUserId == lessonCreateDTO.CoachLessonId)
+            if (!_coachLessonService.IsCoachLessonAvailable(coachLessonId))
             {
-                ModelState.AddModelError("CoachLessonId", "Nie można zapisać się na własną lekcję.");
+                ModelState.AddModelError("CoachLessonId", "Nie można zapisać się tę lekcję.");
+                return BadRequest(ModelState);
+            }
+            if (_coachLessonService.IsUserAlreadySignedUpForCoachLesson(coachLessonId, currentUserId))
+            {
+                ModelState.AddModelError("CoachLessonId", "Jesteś już zapisany na tę lekcję.");
                 return BadRequest(ModelState);
             }
 

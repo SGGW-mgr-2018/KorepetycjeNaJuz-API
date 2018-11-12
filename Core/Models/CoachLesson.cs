@@ -12,6 +12,9 @@ namespace KorepetycjeNaJuz.Core.Models
         public int CoachId { get; set; }
         public virtual User Coach { get; set; }
 
+        public int LessonStatusId { get; set; }
+        public virtual LessonStatus LessonStatus { get; set; }
+
         public int LessonSubjectId { get; set; }
         public virtual LessonSubject Subject { get; set; }
 
