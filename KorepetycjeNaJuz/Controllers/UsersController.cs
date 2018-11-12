@@ -85,7 +85,18 @@ namespace KorepetycjeNaJuz.Controllers
             User _userTmp;
 
             if (!_userExists) return NotFound();
-            else _userTmp = _context.Users.Find(id);
+            else
+            { // Logic
+                _userTmp = _context.Users.Find(id);
+                if (user.Email != _userTmp.Email)
+                    user.EmailConfirmed = false;
+                else
+                    user.EmailConfirmed = true;
+                if (user.PhoneNumber != _userTmp.PhoneNumber)
+                    user.PhoneNumberConfirmed = false;
+                else
+                    user.PhoneNumberConfirmed = true;
+            }
 
             _context.Entry(user).State = EntityState.Modified;
 
