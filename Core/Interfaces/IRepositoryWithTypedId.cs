@@ -11,15 +11,15 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         Task<List<T>> ListAllAsync();
         IEnumerable<T> ListAll();
         T Add( T entity );
-        Task AddAsync( T entity );
-        void Update( T entity );
-        Task UpdateAsync( T entity );
-        void Delete( T entity );
-        Task DeleteAsync( T entity );
-        void Delete( Tid id );
-        Task DeleteAsync( Tid id );
-        void DeleteRange( IEnumerable<T> objects );
-        Task DeleteRangeAsync( IEnumerable<T> objects );
+        Task<T> AddAsync( T entity );
+        T Update( T entity );
+        Task<T> UpdateAsync( T entity );
+        int Delete( T entity );
+        Task<int> DeleteAsync( T entity );
+        int Delete( Tid id );
+        Task<int> DeleteAsync( Tid id );
+        int DeleteRange( IEnumerable<T> objects );
+        Task<int> DeleteRangeAsync( IEnumerable<T> objects );
         IQueryable<T> Query();
     }
 }

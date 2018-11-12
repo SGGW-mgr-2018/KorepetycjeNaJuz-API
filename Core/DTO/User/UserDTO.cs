@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace KorepetycjeNaJuz.Data.DTO
+﻿namespace KorepetycjeNaJuz.Core.DTO
 {
     public class UserDTO
     {

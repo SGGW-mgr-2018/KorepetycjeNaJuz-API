@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KorepetycjeNaJuz", "Korepet
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KorepetycjeNaJuz.Infrastructure", "KorepetycjeNaJuz.Data\KorepetycjeNaJuz.Infrastructure.csproj", "{DA0D1FFB-DC15-4E19-BC90-D021FBCA5D4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KorepetycjeNaJuz.Core", "Core\KorepetycjeNaJuz.Core.csproj", "{AA62525B-D000-4B39-891B-98D871C2855E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KorepetycjeNaJuz.Core", "Core\KorepetycjeNaJuz.Core.csproj", "{AA62525B-D000-4B39-891B-98D871C2855E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

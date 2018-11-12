@@ -1,6 +1,6 @@
 ﻿using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
-using KorepetycjeNaJuz.DTO;
+using KorepetycjeNaJuz.Core.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

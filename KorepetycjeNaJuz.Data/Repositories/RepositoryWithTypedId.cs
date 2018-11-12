@@ -23,35 +23,35 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             return result;
         }
 
-        public virtual Task AddAsync( T entity )
+        public virtual async Task<T> AddAsync( T entity )
         {
-            this._dbContext.Add( entity );
-            return this._dbContext.SaveChangesAsync();
+            T result = this._dbContext.Add( entity ).Entity;
+            await this._dbContext.SaveChangesAsync();
+            return result;
         }
 
-        public virtual void Delete( T entity )
+        public virtual int Delete( T entity )
         {
             this._dbContext.Remove( entity );
-            this._dbContext.SaveChanges();
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual void Delete( Tid id )
+        public virtual int Delete( Tid id )
         {
             this._dbContext.Remove( this._dbSet.Find( id ) );
-            this._dbContext.SaveChanges();
-
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual Task DeleteAsync( T entity )
+        public virtual async Task<int> DeleteAsync( T entity )
         {
             this._dbContext.Remove( entity );
-            return this._dbContext.SaveChangesAsync();
+            return await this._dbContext.SaveChangesAsync();
         }
 
-        public virtual Task DeleteAsync( Tid id )
+        public virtual async Task<int> DeleteAsync( Tid id )
         {
             this._dbContext.Remove( this._dbContext.Set<T>().Find( id ) );
-            return this._dbContext.SaveChangesAsync();
+            return await this._dbContext.SaveChangesAsync();
         }
 
         public virtual T GetById( Tid id )
@@ -59,9 +59,9 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             return this._dbSet.Find( id );
         }
 
-        public virtual Task<T> GetByIdAsync( Tid id )
+        public virtual async Task<T> GetByIdAsync( Tid id )
         {
-            return this._dbSet.FindAsync( id );
+            return await this._dbSet.FindAsync( id );
         }
 
         public virtual IEnumerable<T> ListAll()
@@ -69,23 +69,24 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             return this._dbSet.AsEnumerable();
         }
 
-        public virtual Task<List<T>> ListAllAsync()
+        public virtual async Task<List<T>> ListAllAsync()
         {
-            return this._dbSet.ToListAsync();
+            return await this._dbSet.ToListAsync();
         }
 
-        public virtual void Update( T entity )
+        public virtual T Update( T entity )
         {
             this._dbContext.Entry( entity ).State = EntityState.Modified;
-            this._dbSet.Update( entity );
+            T result = this._dbSet.Update( entity ).Entity;
             this._dbContext.SaveChanges();
+            return result;
         }
 
-        public virtual Task UpdateAsync( T entity )
+        public virtual async Task<T> UpdateAsync( T entity )
         {
-            this._dbSet.Update( entity );
-            return this._dbContext.SaveChangesAsync();
-
+            T result = this._dbSet.Update( entity ).Entity;
+            await this._dbContext.SaveChangesAsync();
+            return result;
         }
 
         public virtual IQueryable<T> Query()
@@ -93,16 +94,16 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             return this._dbSet;
         }
 
-        public virtual void DeleteRange( IEnumerable<T> objects )
+        public virtual int DeleteRange( IEnumerable<T> objects )
         {
             this._dbContext.RemoveRange( objects );
-            this._dbContext.SaveChanges();
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual Task DeleteRangeAsync( IEnumerable<T> objects )
+        public virtual async Task<int> DeleteRangeAsync( IEnumerable<T> objects )
         {
             this._dbContext.RemoveRange( objects );
-            return this._dbContext.SaveChangesAsync();
+            return await this._dbContext.SaveChangesAsync();
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using KorepetycjeNaJuz.Core.Models;
-using KorepetycjeNaJuz.Data.DTO;
+using KorepetycjeNaJuz.Core.DTO;
 
-namespace KorepetycjeNaJuz.Mappings
+namespace KorepetycjeNaJuz.Core.Mappings
 {
     public class UserMappings : Profile
     {
