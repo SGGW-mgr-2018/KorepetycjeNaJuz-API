@@ -1,5 +1,4 @@
 ﻿using System;
-using AutoMapper;
 using NLog;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +25,10 @@ namespace KorepetycjeNaJuz.Controllers
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
+        /// <summary>
+        /// Pozwala pobrać wszystkich użytkowników
+        /// </summary>
+        /// <returns>Zwraca JSON zawierający dane wszystkich użytkowników z bazy danych</returns>
         // GET: api/Users
         [HttpGet]
         public IEnumerable<User> GetUsers()
@@ -34,6 +37,13 @@ namespace KorepetycjeNaJuz.Controllers
             return _context.Users;
         }
 
+        /// <summary>
+        /// Pozwala pobrać konkretnego użytkownika na podstawie ID
+        /// </summary>
+        /// <param name="id">Numer ID wybranego użytkownika</param>
+        /// <returns>Dane użytkownika o podanym ID</returns>
+        /// <response code="400">Przekazano niepoprawne zapytanie bez numeru ID</response>
+        /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser([FromRoute] int id)
@@ -50,6 +60,15 @@ namespace KorepetycjeNaJuz.Controllers
             return Ok(user);
         }
 
+        /// <summary>
+        /// Edycja użytkownika o wskazanym numerze ID
+        /// </summary>
+        /// <param name="id">Numer ID wybranego użytkownika</param>
+        /// <param name="user">JSON zawierający wszystkie dane użytkownika</param>
+        /// <returns>Kod odpowiedzi HTTP 204, 400 lub 404</returns>
+        /// <response code="204">Poprawnie edytowano użytkownika</response>
+        /// <response code="400">Przekazano niepoprawne zapytanie</response>
+        /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         // PUT: api/Users/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser([FromRoute] int id, [FromBody] User user)
@@ -75,7 +94,7 @@ namespace KorepetycjeNaJuz.Controllers
             {
                 UserControllerException uce = new UserControllerException(string.Format("Database update operation was impossible due to the following cause:\n", e.Message));
                 _logger.Error(uce.Message);
-                throw uce;
+                return StatusCode(304, uce.Message);
             }
 
             _logger.Info(string.Format("User {0} {1} has been modified.", _userTmp.FirstName, _userTmp.LastName));
@@ -83,6 +102,13 @@ namespace KorepetycjeNaJuz.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Rejestracja użytkownika w bazie danych
+        /// </summary>
+        /// <param name="user">JSON zawierający wszystkie wymagane dane użytkownika</param>
+        /// <returns>JSON ze wszystkimi danymi nowego użytkownika</returns>
+        /// <response code="201">Poprawnie utworzono użytkownika</response>
+        /// <response code="400">Przekazano niepoprawne zapytanie</response>
         // POST: api/Users
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] User user)
@@ -99,6 +125,14 @@ namespace KorepetycjeNaJuz.Controllers
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
 
+        /// <summary>
+        /// Usunięcie użytkownika o podanym ID z bazy danych
+        /// </summary>
+        /// <param name="id">Numer ID użytkownika wskazanego do usunięcia</param>
+        /// <returns>JSON zawierający dane usuniętego użytkownika</returns>
+        /// <response code="200">Poprawnie usunięto użytkownika</response>
+        /// <response code="400">Przekazano niepoprawne zapytanie</response>
+        /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
