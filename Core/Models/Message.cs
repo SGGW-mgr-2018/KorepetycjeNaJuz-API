@@ -1,10 +1,11 @@
-﻿using System;
+﻿using KorepetycjeNaJuz.Core.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class Message
+    public class Message : IEntityWithTypedId<int>
     {
         [Key]
         public int Id { get; set; }

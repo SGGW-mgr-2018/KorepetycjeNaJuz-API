@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using KorepetycjeNaJuz.Core.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class LessonStatus
+    public class LessonStatus : IEntityWithTypedId<int>
     {
         [Key]
         public int Id { get; set; }
