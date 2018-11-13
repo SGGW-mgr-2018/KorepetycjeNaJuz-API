@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using KorepetycjeNaJuz.Core.DTO.Message;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
-using KorepetycjeNaJuz.Core.DTO.Message;
-using Microsoft.AspNetCore.Authorization;
-using KorepetycjeNaJuz.Core.Helpers;
-using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -28,12 +25,27 @@ namespace KorepetycjeNaJuz.Controllers
             _logger = LogManager.GetLogger("apiLogger");
         }
 
-        // GET: api/Messages
-        [HttpGet]
-        public IEnumerable<Message> GetMessages()
+        /// <summary>
+        /// Pobiera konwersację z użytkownikiem
+        /// </summary>
+        /// <param name="id">Id rozmówcy</param>
+        /// <returns></returns>
+        //[Authorize("Bearer")]
+        [HttpGet("{id}")]
+        public IActionResult GetMessagesWithUser([FromRoute] int id)
         {
-            return _context.Messages;
-        }
+            try
+            {
+                var currentUserId = 1;// User.GetUserId().Value;
+                return Ok(_context.Messages.Where(m => m.RecipientId == currentUserId && m.OwnerId == id || m.RecipientId == id && m.OwnerId == currentUserId)
+                    .Select(m => new MessageDTO(m)));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during Message download");
+                return NotFound();
+            }
+        }/*
 
         // GET: api/Messages/5
         [HttpGet("{id}")]
@@ -52,7 +64,7 @@ namespace KorepetycjeNaJuz.Controllers
             }
 
             return Ok(message);
-        }
+        }*/
 
         // PUT: api/Messages/5
         [HttpPut("{id}")]
@@ -108,7 +120,7 @@ namespace KorepetycjeNaJuz.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (!_context.Users.Any(u=>u.Id==message.RecipientId))
+                if (! await _context.Users.AnyAsync(u=>u.Id==message.RecipientId))
                 {
                     ModelState.AddModelError("RecipientId", "Użytkownik z takim Id nie istnieje.");
                     return BadRequest(ModelState);
@@ -116,7 +128,7 @@ namespace KorepetycjeNaJuz.Controllers
 
                 var currentUserId = 1;// User.GetUserId().Value;
 
-                _context.Messages.Add(new Message
+                await _context.Messages.AddAsync(new Message
                 {
                     DateOfSending = now,
                     OwnerId = currentUserId,
