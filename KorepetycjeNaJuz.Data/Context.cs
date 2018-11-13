@@ -23,7 +23,7 @@ namespace KorepetycjeNaJuz.Infrastructure
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.Entity<CoachAddress>().ToTable("CoachAddresses");
+            builder.Entity<Address>().ToTable("Addresses");
             builder.Entity<CoachLesson>().ToTable("CoachLessons");
             builder.Entity<LessonLevel>().ToTable("LessonLevels");
             builder.Entity<Lesson>().ToTable("Lessons");
@@ -35,10 +35,12 @@ namespace KorepetycjeNaJuz.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(ConnectionString);
         }
 
-        public DbSet<CoachAddress> CoachAddresses { get; set; }
+        public DbSet<Address> CoachAddresses { get; set; }
         public DbSet<CoachLesson> CoachLessons { get; set; }
         public DbSet<LessonLevel> LessonLevels { get; set; }
         public DbSet<Lesson> Lessons { get; set; }

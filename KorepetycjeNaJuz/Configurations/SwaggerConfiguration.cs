@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using System.Collections.Generic;
+using KorepetycjeNaJuz.Configurations.OperationFilters;
 
 namespace KorepetycjeNaJuz.Configurations
 {
@@ -34,10 +35,13 @@ namespace KorepetycjeNaJuz.Configurations
                 {
                     { "Bearer", new string[] { } }
                 });
-
+                
                 c.DescribeAllEnumsAsStrings();
                 c.IgnoreObsoleteProperties();
                 c.IncludeXmlComments(CreateXmlCommentsPath());
+
+                // Operation Filters
+                c.OperationFilter<AddAuthorizationHeaderParameterOperationFilter>();
             });
         }
 

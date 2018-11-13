@@ -2,7 +2,7 @@
 
 namespace KorepetycjeNaJuz.Core.Interfaces
 {
-    public interface ILessonRepository : IRepositoryWithTypedId<Lesson, int>
+    public interface ICoachLessonRepository : IRepositoryWithTypedId<CoachLesson, int>
     {
 
     }

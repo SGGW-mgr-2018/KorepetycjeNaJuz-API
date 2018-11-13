@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KorepetycjeNaJuz.DTO
+namespace KorepetycjeNaJuz.Core.DTO
 {
     public class UserLoginDTO
     {

@@ -1,25 +1,27 @@
-﻿using System;
+﻿using KorepetycjeNaJuz.Core.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
-    public class Message
+    public class Message : IEntityWithTypedId<int>
     {
         [Key]
         public int Id { get; set; }
 
         [ForeignKey("Messages_Owner")]
         public int OwnerId { get; set; }
-        public User Owner { get; set; }
+        public virtual User Owner { get; set; }
 
         [ForeignKey("Messages_Recipients")]
         public int RecipientId { get; set; }
-        public User Recipient { get; set; }
+        public virtual User Recipient { get; set; }
 
         [MaxLength(1000)]
         public string Content { get; set; }
 
+        [DataType(DataType.DateTime)]
         public DateTime DateOfSending { get; set; }
     }
 }

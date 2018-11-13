@@ -1,190 +1,85 @@
-﻿using KorepetycjeNaJuz.Core.Interfaces;
-using KorepetycjeNaJuz.Core.Models;
-using KorepetycjeNaJuz.DTO;
-using KorepetycjeNaJuz.Infrastructure.Repositories;
+﻿using KorepetycjeNaJuz.Core.DTO;
+using KorepetycjeNaJuz.Core.Interfaces;
+using KorepetycjeNaJuz.Core.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using NLog;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Controllers
 {
-    [Route("api/Lesson")]
-    public class LessonController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class LessonController : ControllerBase
     {
-        private readonly IRepositoryWithTypedId<Lesson, int> _repository;
+        private readonly ILessonService _lessonService;
+        private readonly ICoachLessonService _coachLessonService;
+        private readonly ILogger _logger;
 
-        public LessonController(IRepositoryWithTypedId<Lesson, int> repository)
+        public LessonController(
+            ILessonService lessonService, 
+            ICoachLessonService coachLessonService)
         {
-            _repository = repository as LessonRepository;
+            this._lessonService = lessonService;
+            this._coachLessonService = coachLessonService;
+            this._logger = LogManager.GetLogger("apiLogger");
         }
 
-        [HttpPost]
-        [Route("Add")]
-        public IActionResult Add([FromBody] Lesson lesson)
+        /// <summary>
+        /// Zapisuje zalogowanego użytkownika na zadaną lekcję
+        /// </summary>
+        /// <param name="lessonCreateDTO"></param>
+        /// <returns></returns>
+        /// <response code="201">Poprawnie zapisano na lekcję</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
+        [HttpPost, Route("Create"), Authorize("Bearer")]
+        public async Task<IActionResult> CreateLesson([Required, FromBody] LessonCreateDTO lessonCreateDTO)
         {
-            var created = _repository.Add(lesson);
-            return created.Id == 0 ? StatusCode(500) : (IActionResult)StatusCode(201, new LessonDTO() { Id = created.Id });
-        }
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-        [HttpPost]
-        [Route("AddAsync")]
-        public async Task<IActionResult> AddAsync([FromBody] Lesson lesson)
-        {
-            var created = await _repository.AddAsync(lesson);
-            return created.Id == 0 ? StatusCode(500) : (IActionResult)StatusCode(201, new LessonDTO() { Id = created.Id });
-        }
-
-        [HttpDelete]
-        [Route("Delete")]
-        public IActionResult Delete([FromBody] Lesson lesson)
-        {
-            _repository.Delete(lesson);
-            return StatusCode(200);
-        }
-
-        [HttpDelete]
-        [Route("Delete/{id}")]
-        public IActionResult Delete(int id)
-        {
-            _repository.Delete(id);
-            return StatusCode(200);
-        }
-
-        [HttpDelete]
-        [Route("DeleteAsync")]
-        public async Task<IActionResult> DeleteAsync([FromBody] Lesson lesson)
-        {
-            await _repository.DeleteAsync(lesson);
-            return StatusCode(200);
-        }
-
-        [HttpDelete]
-        [Route("DeleteAsync/{id}")]
-        public async Task<IActionResult> DeleteAsync(int id)
-        {
-            await _repository.DeleteAsync(id);
-            return StatusCode(200);
-        }
-
-        [HttpDelete]
-        [Route("DeleteRange")]
-        public IActionResult DeleteRange([FromBody] IEnumerable<Lesson> lessons)
-        {
-            _repository.DeleteRange(lessons);
-            return StatusCode(200);
-        }
-
-        [HttpDelete]
-        [Route("DeleteRangeAsync")]
-        public async Task<IActionResult> DeleteRangeAsync([FromBody] IEnumerable<Lesson> lessons)
-        {
-            await _repository.DeleteRangeAsync(lessons);
-            return StatusCode(200);
-        }
-
-        [HttpGet]
-        [Route("Get/{id}")]
-        public IActionResult GetById(int id)
-        {
-            var lesson = _repository.GetById(id);
-            return lesson == null ? StatusCode(500) : (IActionResult)StatusCode(200, lesson);
-        }
-
-        [HttpGet]
-        [Route("GetAsync/{id}")]
-        public async Task<IActionResult> GetByIdAsync(int id)
-        {
-            var lesson = await _repository.GetByIdAsync(id);
-            return lesson == null ? StatusCode(500) : (IActionResult)StatusCode(200, lesson);
-        }
-
-        [HttpGet]
-        [Route("ListAll")]
-        public IActionResult ListAll()
-        {
-            var lessons = _repository.ListAll();
-            return lessons.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, lessons);
-        }
-
-        [HttpGet]
-        [Route("ListAllAsync")]
-        public async Task<IActionResult> ListAllAsync()
-        {
-            var lessons = await _repository.ListAllAsync();
-            return lessons.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, lessons);
-        }
-
-        [HttpGet]
-        [Route("Query")]
-        public IActionResult Query()
-        {
-            var queryable = _repository.Query();
-            return queryable.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, queryable);
-        }
-
-        [HttpGet]
-        [Route("LessionsByPosition/{latitiude}/{longitiude}/{radius}/{subjectId}/{levelId}")]
-        public IActionResult LessionsByPosition(double latitiude, double longitiude, double radius, int subjectId, int levelId)
-        {
-            double distance(double lat1, double lon1, double lat2, double lon2)
+            var currentUserId = this.User.GetUserId().Value;
+            var coachLessonId = lessonCreateDTO.CoachLessonId;
+            lessonCreateDTO.StudentId = currentUserId;
+            
+            // Custom Validation 
+            if (!_coachLessonService.IsCoachLessonExists(coachLessonId))
             {
-                double theta = lon1 - lon2;
-                double dist = Math.Sin(deg2rad(lat1)) * Math.Sin(deg2rad(lat2)) + Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) * Math.Cos(deg2rad(theta));
-                dist = Math.Acos(dist);
-                dist = rad2deg(dist);
-                dist = dist * 60 * 1.1515;
-                dist = dist * 1.609344; // to kilomiters
-                return (dist);
+                return NotFound();
             }
-            double deg2rad(double deg)
+            if (_coachLessonService.IsUserOwnerOfCoachLesson(coachLessonId, currentUserId))
             {
-                return (deg * Math.PI / 180.0);
+                ModelState.AddModelError("CoachLessonId", "Nie można zapisać się na swoją lekcję.");
+                return BadRequest(ModelState);
             }
-            double rad2deg(double rad)
+            if (!_coachLessonService.IsCoachLessonAvailable(coachLessonId))
             {
-                return (rad / Math.PI * 180.0);
+                ModelState.AddModelError("CoachLessonId", "Nie można zapisać się tę lekcję.");
+                return BadRequest(ModelState);
+            }
+            if (_coachLessonService.IsUserAlreadySignedUpForCoachLesson(coachLessonId, currentUserId))
+            {
+                ModelState.AddModelError("CoachLessonId", "Jesteś już zapisany na tę lekcję.");
+                return BadRequest(ModelState);
             }
 
-            var query = _repository.ListAll();
-            List<Lesson> output = new List<Lesson>();
-            foreach (Lesson lesson in query)
+            try
             {
-                if (    distance(lesson.CoachAddress.Latitude, lesson.CoachAddress.Longitude,latitiude,longitiude) <= radius && 
-                        lesson.CoachLesson.LessonSubjectId == subjectId && 
-                        lesson.CoachLesson.LessonLevelId == levelId)
-                {
-                    output.Add(lesson);
-                }
+                await _lessonService.CreateLessonAsync(lessonCreateDTO);
             }
-            return output.Count() < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, output);
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during Lesson creation");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return StatusCode((int)HttpStatusCode.Created);
         }
-        
-
-        [HttpPost]
-        [Route("Update")]
-        public IActionResult Update([FromBody] Lesson lesson)
-        {
-            if (lesson.Id < 1)
-                return StatusCode(500, "Provided ID is incorrect.");
-
-            _repository.Update(lesson);
-            return StatusCode(200, lesson);
-        }
-
-        [HttpPost]
-        [Route("UpdateAsync")]
-        public async Task<IActionResult> UpdateAsync([FromBody] Lesson lesson)
-        {
-            if (lesson.Id < 1)
-                return StatusCode(500, "Provided ID is incorrect.");
-
-            await _repository.UpdateAsync(lesson);
-            return StatusCode(200, lesson);
-        }
-
     }
 }

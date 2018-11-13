@@ -12,98 +12,98 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
         protected readonly DbSet<T> _dbSet;
         public RepositoryWithTypedId( KorepetycjeContext dbContext )
         {
-            _dbContext = dbContext;
-            _dbSet = _dbContext.Set<T>();
+            this._dbContext = dbContext;
+            this._dbSet = this._dbContext.Set<T>();
         }
 
         public virtual T Add( T entity )
         {
-            T result = _dbContext.Add( entity ).Entity;
-            _dbContext.SaveChanges();
+            T result = this._dbContext.Add( entity ).Entity;
+            this._dbContext.SaveChanges();
             return result;
         }
 
         public virtual async Task<T> AddAsync( T entity )
         {
-            T result = _dbContext.Add( entity ).Entity;
-            await _dbContext.SaveChangesAsync();
-            return await Task.FromResult(result);
+            T result = this._dbContext.Add( entity ).Entity;
+            await this._dbContext.SaveChangesAsync();
+            return result;
         }
 
-        public virtual void Delete( T entity )
+        public virtual int Delete( T entity )
         {
-            _dbContext.Remove( entity );
-            _dbContext.SaveChanges();
+            this._dbContext.Remove( entity );
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual void Delete( Tid id )
+        public virtual int Delete( Tid id )
         {
-            _dbContext.Remove( this._dbSet.Find( id ) );
-            _dbContext.SaveChanges();
-
+            this._dbContext.Remove( this._dbSet.Find( id ) );
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual async Task DeleteAsync( T entity )
+        public virtual async Task<int> DeleteAsync( T entity )
         {
-            _dbContext.Remove( entity );
-            await _dbContext.SaveChangesAsync();
+            this._dbContext.Remove( entity );
+            return await this._dbContext.SaveChangesAsync();
         }
 
-        public virtual async Task DeleteAsync( Tid id )
+        public virtual async Task<int> DeleteAsync( Tid id )
         {
-            _dbContext.Remove( this._dbContext.Set<T>().Find( id ) );
-            await _dbContext.SaveChangesAsync();
+            this._dbContext.Remove( this._dbContext.Set<T>().Find( id ) );
+            return await this._dbContext.SaveChangesAsync();
         }
 
         public virtual T GetById( Tid id )
         {
-            return _dbSet.Find( id );
+            return this._dbSet.Find( id );
         }
 
         public virtual async Task<T> GetByIdAsync( Tid id )
         {
-            return await _dbSet.FindAsync( id );
+            return await this._dbSet.FindAsync( id );
         }
 
         public virtual IEnumerable<T> ListAll()
         {
-            return _dbSet.AsEnumerable();
+            return this._dbSet.AsEnumerable();
         }
 
         public virtual async Task<List<T>> ListAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await this._dbSet.ToListAsync();
         }
 
-        public virtual void Update( T entity )
+        public virtual T Update( T entity )
         {
-            _dbContext.Entry( entity ).State = EntityState.Modified;
-            _dbSet.Update( entity );
-            _dbContext.SaveChanges();
+            this._dbContext.Entry( entity ).State = EntityState.Modified;
+            T result = this._dbSet.Update( entity ).Entity;
+            this._dbContext.SaveChanges();
+            return result;
         }
 
-        public virtual async Task UpdateAsync( T entity )
+        public virtual async Task<T> UpdateAsync( T entity )
         {
-            _dbSet.Update( entity );
-            await _dbContext.SaveChangesAsync();
-
+            T result = this._dbSet.Update( entity ).Entity;
+            await this._dbContext.SaveChangesAsync();
+            return result;
         }
 
         public virtual IQueryable<T> Query()
         {
-            return _dbSet;
+            return this._dbSet;
         }
 
-        public virtual void DeleteRange( IEnumerable<T> objects )
+        public virtual int DeleteRange( IEnumerable<T> objects )
         {
-            _dbContext.RemoveRange( objects );
-            _dbContext.SaveChanges();
+            this._dbContext.RemoveRange( objects );
+            return this._dbContext.SaveChanges();
         }
 
-        public virtual async Task DeleteRangeAsync( IEnumerable<T> objects )
+        public virtual async Task<int> DeleteRangeAsync( IEnumerable<T> objects )
         {
-            _dbContext.RemoveRange( objects );
-            await _dbContext.SaveChangesAsync();
+            this._dbContext.RemoveRange( objects );
+            return await this._dbContext.SaveChangesAsync();
         }
     }
 }

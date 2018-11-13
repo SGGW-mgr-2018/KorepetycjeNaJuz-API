@@ -1,10 +1,11 @@
-using AutoMapper;
+﻿using AutoMapper;
 using KorepetycjeNaJuz.Configurations;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
-using KorepetycjeNaJuz.Infrastructure.Repositories;
 using KorepetycjeNaJuz.Infrastructure.Auth;
+using KorepetycjeNaJuz.Infrastructure.Repositories;
+using KorepetycjeNaJuz.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -35,8 +36,6 @@ namespace KorepetycjeNaJuz
             services.AddDbContext<KorepetycjeContext>( options =>
                     options.UseSqlServer( this.Configuration.GetConnectionString( "DefaultConnection" ) ) );
             KorepetycjeContext.ConnectionString = this.Configuration.GetConnectionString( "DefaultConnection" );
-            services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<Lesson, int>, LessonRepository>();
-            services.AddScoped<Core.Interfaces.IRepositoryWithTypedId<User, int>, GenericRepository<User>>();
 
             SwaggerConfiguration.RegisterService( services );
 
@@ -50,7 +49,21 @@ namespace KorepetycjeNaJuz
             services.AddMvc().SetCompatibilityVersion( CompatibilityVersion.Version_2_1 );
             services.AddAutoMapper(); // Register AutoMapper
 
+            RegisterServices(services);
+            RegisterRepositories(services);
+        }
+
+        private void RegisterServices(IServiceCollection services)
+        {
             services.AddScoped<IOAuthService, OAuthService>();
+            services.AddScoped<ILessonService, LessonService>();
+            services.AddScoped<ICoachLessonService, CoachLessonService>();
+        }
+
+        private void RegisterRepositories(IServiceCollection services)
+        {
+            services.AddScoped<ILessonRepository, LessonRepository>();
+            services.AddScoped<ICoachLessonRepository, CoachLessonRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

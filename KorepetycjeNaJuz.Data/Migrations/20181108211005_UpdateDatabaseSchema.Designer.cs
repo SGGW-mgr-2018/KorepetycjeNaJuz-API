@@ -4,14 +4,16 @@ using KorepetycjeNaJuz.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KorepetycjeNaJuz.Data.Migrations
 {
     [DbContext(typeof(KorepetycjeContext))]
-    partial class KorepetycjeContextModelSnapshot : ModelSnapshot
+    [Migration("20181108211005_UpdateDatabaseSchema")]
+    partial class UpdateDatabaseSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,7 +28,7 @@ namespace KorepetycjeNaJuz.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("City")
-                        .HasMaxLength(100);
+                        .HasMaxLength(1000);
 
                     b.Property<int>("CoachId");
 
@@ -35,7 +37,7 @@ namespace KorepetycjeNaJuz.Data.Migrations
                     b.Property<double?>("Longitude");
 
                     b.Property<string>("Street")
-                        .HasMaxLength(250);
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 
@@ -60,8 +62,6 @@ namespace KorepetycjeNaJuz.Data.Migrations
 
                     b.Property<int>("LessonLevelId");
 
-                    b.Property<int>("LessonStatusId");
-
                     b.Property<int>("LessonSubjectId");
 
                     b.Property<decimal>("RatePerHour");
@@ -73,8 +73,6 @@ namespace KorepetycjeNaJuz.Data.Migrations
                     b.HasIndex("CoachId");
 
                     b.HasIndex("LessonLevelId");
-
-                    b.HasIndex("LessonStatusId");
 
                     b.HasIndex("LessonSubjectId");
 
@@ -388,11 +386,6 @@ namespace KorepetycjeNaJuz.Data.Migrations
                     b.HasOne("KorepetycjeNaJuz.Core.Models.LessonLevel", "LessonLevel")
                         .WithMany()
                         .HasForeignKey("LessonLevelId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("KorepetycjeNaJuz.Core.Models.LessonStatus", "LessonStatus")
-                        .WithMany()
-                        .HasForeignKey("LessonStatusId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("KorepetycjeNaJuz.Core.Models.LessonSubject", "Subject")

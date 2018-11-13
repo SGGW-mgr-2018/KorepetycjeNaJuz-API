@@ -1,4 +1,5 @@
 ﻿using KorepetycjeNaJuz.Core.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace KorepetycjeNaJuz.Core.Models
@@ -9,27 +10,27 @@ namespace KorepetycjeNaJuz.Core.Models
         public int Id { get; set; }
 
         public int LessonStatusId { get; set; }
-        public LessonStatus LessonStatus { get; set; }
+        public virtual LessonStatus LessonStatus { get; set; }
 
         public int CoachLessonId { get; set; }
-        public CoachLesson CoachLesson { get; set; }
+        public virtual CoachLesson CoachLesson { get; set; }
 
         public int StudentId { get; set; }
-        public User Student { get; set; }
+        public virtual User Student { get; set; }
 
-        public int CoachAddressId { get; set; }
-        public CoachAddress CoachAddress { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime Date { get; set; }
 
-        public System.DateTime Date { get; set; }
-
-        public int NumberOfHours { get; set; }
+        public float NumberOfHours { get; set; }
 
         public byte? RatingOfStudent { get; set; }
 
+        [MaxLength(2000)]
         public string OpinionOfStudent { get; set; }
 
         public byte? RatingOfCoach { get; set; }
 
+        [MaxLength(2000)]
         public string OpinionOfCoach { get; set; }
     }
 }
