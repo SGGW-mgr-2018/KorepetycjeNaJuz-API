@@ -14,35 +14,30 @@
 
         /// <summary>
         /// Nowo dodane zgłoszenie (lesson), które oczekuje na zaakceptowanie przez korepetytora
-        /// Jest widoczne 
-        /// </summary>
-        WaitingToApprove = 2,
-
-        /// <summary>
         /// Lekcja (coachLesson) do której zgłosiła się co najmniej jedna osoba
         /// Nie można edytować
         /// Nadal jest widoczna i można do niej dołączyć 
         /// </summary>
-        Reserved = 3,
+        Reserved = 2,
 
         /// <summary>
         /// Lekcja/zgłoszenie (coachLesson/lesson) zatwierdzone/a
         /// Nie można edytować
         /// Nie jest widoczna i nie można do niej dołączyć 
         /// </summary>
-        Approved = 4,
+        Approved = 3,
 
         /// <summary>
         /// Lekcja (lesson) odrzucona przez korepetytora
         /// Nie można edytować
         /// </summary>
-        Rejected = 5,
+        Rejected = 4,
 
         /// <summary>
         /// Zgłoszenie (coachLesson) anulowane przez korepetytora
         /// Nie można edytować
         /// Nie jest widoczna i nie można do niej dołaczyć
         /// </summary>
-        Canceled = 6   
+        Canceled = 5   
     }
 }
