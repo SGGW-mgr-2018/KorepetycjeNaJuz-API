@@ -1,11 +1,12 @@
 ﻿using KorepetycjeNaJuz.Core.DTO.Message;
+using KorepetycjeNaJuz.Core.Helpers;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -30,13 +31,13 @@ namespace KorepetycjeNaJuz.Controllers
         /// </summary>
         /// <param name="id">Id rozmówcy</param>
         /// <returns></returns>
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         [HttpGet("{id}")]
-        public IActionResult GetMessagesWithUser([FromRoute] int id)
+        public IActionResult GetConversationWithUser([FromRoute] int id)
         {
             try
             {
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
                 return Ok(_context.Messages.Where(m => m.RecipientId == currentUserId && m.OwnerId == id || m.RecipientId == id && m.OwnerId == currentUserId)
                     .Select(m => new MessageDTO(m)));
             }
@@ -45,71 +46,37 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during Message download");
                 return NotFound();
             }
-        }/*
-
-        // GET: api/Messages/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetMessage([FromRoute] int id)
+        }/// <summary>
+         /// Pobiera konwersacje użytkownika
+         /// </summary>
+         /// <returns></returns>
+        [Authorize("Bearer")]
+        [HttpGet]
+        public IActionResult GetConversations()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var message = await _context.Messages.FindAsync(id);
-
-            if (message == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(message);
-        }*/
-
-        // PUT: api/Messages/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMessage([FromRoute] int id, [FromBody] Message message)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != message.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(message).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                var currentUserId = User.GetUserId().Value;
+                return Ok(_context.Messages.Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
+                    .GroupBy(m=>m.OwnerId==currentUserId?m.RecipientId:m.OwnerId).Select(g => new ConversationDTO(g)));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!MessageExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                _logger.Error(ex, "Error during conversation download");
+                return NotFound();
             }
-
-            return NoContent();
         }
         /// <summary>
         /// Wysyła wiadomość
         /// </summary>
+        /// <response code="400">Niepoprawne argumenty</response>
         /// <response code="201">Poprawnie wysłano wiadomość</response>
         /// <param name="message"></param>
         /// <returns></returns>
         // POST: api/Messages
         [HttpPost]
-        [ProducesResponseType(201)]
-        //[Authorize("Bearer")]
+        [ProducesResponseType(201), ProducesResponseType(400)]
+        [Authorize("Bearer")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDTO message)
         {
             try
@@ -126,7 +93,7 @@ namespace KorepetycjeNaJuz.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
 
                 await _context.Messages.AddAsync(new Message
                 {
@@ -144,32 +111,6 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during Message creation");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-        }
-
-        // DELETE: api/Messages/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMessage([FromRoute] int id)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var message = await _context.Messages.FindAsync(id);
-            if (message == null)
-            {
-                return NotFound();
-            }
-
-            _context.Messages.Remove(message);
-            await _context.SaveChangesAsync();
-
-            return Ok(message);
-        }
-
-        private bool MessageExists(int id)
-        {
-            return _context.Messages.Any(e => e.Id == id);
         }
     }
 }
