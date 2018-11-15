@@ -57,8 +57,13 @@ namespace KorepetycjeNaJuz.Controllers
             try
             {
                 var currentUserId = User.GetUserId().Value;
-                return Ok(_context.Messages.Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
-                    .GroupBy(m=>m.OwnerId==currentUserId?m.RecipientId:m.OwnerId).Select(g => new ConversationDTO(g)));
+                var conversation = _context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
+                    .GroupBy(m => m.OwnerId == currentUserId ? m.RecipientId : m.OwnerId);
+                var usersId = conversation.Select(c => c.Key).ToList();
+                var users = _context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionary(u => u.Id);
+                
+                return Ok(_context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
+                    .GroupBy(m=>m.OwnerId==currentUserId?m.RecipientId:m.OwnerId).Select(g => ConversationDTO.Create(g, users)));
             }
             catch (Exception ex)
             {
