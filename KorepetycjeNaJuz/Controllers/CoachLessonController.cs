@@ -35,11 +35,12 @@ namespace KorepetycjeNaJuz.Controllers
 
 
         /// <summary>
-        /// metoda wyszukująca lekcje.
+        /// Metoda wyszukująca lekcje po zadanych filtrach.
         /// </summary>
         /// <param name="getCoachLessonsByFiltersDTO">Dane lekcji</param>
         /// <returns>Wygenerowany token JWT</returns>
         /// <response code="200">Lista dostępnych lekcji</response>
+        /// <response code="404">Nie znaleziono lekcji o podanych kryteriach</response>
         [HttpPost,Route("GetCoachLessonsByFilters"), AllowAnonymous]
         public IActionResult GetCoachLessonsByFilters([Required] GetCoachLessonsByFiltersDTO getCoachLessonsByFiltersDTO)
         {
@@ -94,10 +95,7 @@ namespace KorepetycjeNaJuz.Controllers
             }
 
 
-
             return output.Count < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, output);
-            
-            return new JsonResult("");
         }
 
     }
