@@ -10,7 +10,6 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace KorepetycjeNaJuz.Controllers
 {
-    [Authorize("Bearer")]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorizationController : ControllerBase
@@ -58,7 +57,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <returns>Wygenerowany token JWT</returns>
         /// <response code="200">Pomyślnie odświeżono token użytkownika - zwraca wygenerowany JWT Token</response>
         /// <response code="401">Nie podano aktualnego tokenu. Użytkownik nie zalogowany.</response>
-        [HttpPost("Refresh")]
+        [HttpPost("Refresh"), Authorize("Bearer")]
         public IActionResult RefreshToken()
         {
             string token = this.HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
