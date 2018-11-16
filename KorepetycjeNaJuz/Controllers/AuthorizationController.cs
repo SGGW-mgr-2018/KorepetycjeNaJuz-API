@@ -1,6 +1,6 @@
-﻿using KorepetycjeNaJuz.Core.Interfaces;
+﻿using KorepetycjeNaJuz.Core.DTO;
+using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
-using KorepetycjeNaJuz.Core.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -10,8 +10,8 @@ using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace KorepetycjeNaJuz.Controllers
 {
-    [Authorize( "Bearer" )]
-    [Route( "api/[controller]" )]
+    [Authorize("Bearer")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthorizationController : ControllerBase
     {
@@ -34,7 +34,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="200">Pomyślna autoryzacja użytkownika - zwraca wygenerowany JWT Token</response>
         /// <response code="400">Logowanie nie powiodło się - niepoprawne dane logowania</response>
         /// <response code="403">Konto użytkownika jest zablokowane</response>
-        [HttpPost( "Login" ), AllowAnonymous]        
+        [HttpPost( "Login" ), AllowAnonymous]
         public async Task<IActionResult> LoginUserAsync([Required] UserLoginDTO userLoginDto)
         {
 
@@ -52,6 +52,20 @@ namespace KorepetycjeNaJuz.Controllers
             return new JsonResult( userToken );
         }
 
+        /// <summary>
+        /// Synchroniczna metoda zwracająca nowy token (z nowym Expiration Date).
+        /// </summary>
+        /// <returns>Wygenerowany token JWT</returns>
+        /// <response code="200">Pomyślna autoryzacja użytkownika - zwraca wygenerowany JWT Token</response>
+        /// <response code="401">Nie podano aktualnego tokenu. Użytkownik nie zalogowany.</response>
+        [HttpPost("Refresh")]
+        public IActionResult RefreshToken()
+        {
+            string token = this.HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
+            System.Collections.Generic.IDictionary<string, string> claims = this._oAuthService.GetClaims(token);
+            string newToken = this._oAuthService.GetUserAuthToken(claims["unique_name"], claims["UserId"]);
+            return new JsonResult(newToken);
+        }
 
     }
 }
