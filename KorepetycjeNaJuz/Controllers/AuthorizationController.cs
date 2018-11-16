@@ -56,7 +56,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// Synchroniczna metoda zwracająca nowy token (z nowym Expiration Date).
         /// </summary>
         /// <returns>Wygenerowany token JWT</returns>
-        /// <response code="200">Pomyślna autoryzacja użytkownika - zwraca wygenerowany JWT Token</response>
+        /// <response code="200">Pomyślnie odświeżono token użytkownika - zwraca wygenerowany JWT Token</response>
         /// <response code="401">Nie podano aktualnego tokenu. Użytkownik nie zalogowany.</response>
         [HttpPost("Refresh")]
         public IActionResult RefreshToken()
