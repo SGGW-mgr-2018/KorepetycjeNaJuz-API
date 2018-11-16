@@ -18,12 +18,15 @@ namespace KorepetycjeNaJuz.Core.DTO
         [Required(ErrorMessage = "To pole jest wymagane.")]
         public string Subject { get; set; }
 
+        [Required(ErrorMessage = "To pole jest wymagane.")]
         public string Level { get; set; }
 
         public int CoachId { get; set; }
 
+        [Required(ErrorMessage = "To pole jest wymagane.")]
         public DateTime DateFrom { get; set; }
 
+        [Required(ErrorMessage = "To pole jest wymagane.")]
         public DateTime DateTo { get; set; }
 
 
