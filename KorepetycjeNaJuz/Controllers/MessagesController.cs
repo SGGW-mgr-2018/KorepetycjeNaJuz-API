@@ -1,6 +1,8 @@
 ﻿using KorepetycjeNaJuz.Core.DTO.Message;
+using KorepetycjeNaJuz.Core.Helpers;
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
@@ -145,7 +147,7 @@ namespace KorepetycjeNaJuz.Controllers
             }
             catch(Exception ex)
             {
-                _logger.Error(ex, "Error during Message creation");
+                _logger.Error(ex, "Error during Message removal");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }

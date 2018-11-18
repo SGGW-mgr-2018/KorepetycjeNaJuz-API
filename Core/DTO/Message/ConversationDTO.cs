@@ -1,8 +1,7 @@
-﻿using System;
+﻿using KorepetycjeNaJuz.Core.Models;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using KorepetycjeNaJuz.Core.Models;
 
 namespace KorepetycjeNaJuz.Core.DTO.Message
 {
