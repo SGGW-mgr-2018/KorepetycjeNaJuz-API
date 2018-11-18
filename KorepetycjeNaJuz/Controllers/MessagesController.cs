@@ -129,7 +129,7 @@ namespace KorepetycjeNaJuz.Controllers
         {
             try
             {
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
                 var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
                 if (message==null)
                 {
