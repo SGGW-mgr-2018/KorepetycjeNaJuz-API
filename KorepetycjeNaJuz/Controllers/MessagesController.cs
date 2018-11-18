@@ -124,7 +124,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(200), ProducesResponseType(400)]
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         public async Task<IActionResult> DeleteMessage(int id)
         {
             try
