@@ -147,7 +147,7 @@ namespace KorepetycjeNaJuz.Controllers
             }
             catch(Exception ex)
             {
-                _logger.Error(ex, "Error during Message creation");
+                _logger.Error(ex, "Error during Message removal");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
