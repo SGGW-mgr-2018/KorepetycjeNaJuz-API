@@ -48,7 +48,7 @@ namespace KorepetycjeNaJuz.Controllers
             }
             User user = await this._userManager.FindByNameAsync( userLoginDto.Username );
             string userToken = this._oAuthService.GetUserAuthToken( userLoginDto.Username, user.Id.ToString() );
-            return new JsonResult( userToken );
+            return new JsonResult( new { token = userToken } );
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace KorepetycjeNaJuz.Controllers
             string token = this.HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
             System.Collections.Generic.IDictionary<string, string> claims = this._oAuthService.GetClaims(token);
             string newToken = this._oAuthService.GetUserAuthToken(claims["unique_name"], claims["UserId"]);
-            return new JsonResult(newToken);
+            return new JsonResult(new { token = newToken });
         }
 
     }
