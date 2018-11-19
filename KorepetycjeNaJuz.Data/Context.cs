@@ -31,11 +31,27 @@ namespace KorepetycjeNaJuz.Infrastructure
             builder.Entity<LessonSubject>().ToTable("LessonSubjects");
             builder.Entity<Message>().ToTable("Messages");
             builder.Entity<User>().ToTable("Users");
+            builder.Entity<CoachLessonLevel>().ToTable("CoachLessonLevels");
+            builder.Entity<CoachLessonLevel>()
+                .HasKey(bc => new { bc.CoachLessonId, bc.LessonLevelId });
+
+            builder.Entity<CoachLessonLevel>()
+                .HasOne(bc => bc.CoachLesson)
+                .WithMany(b => b.LessonLevels)
+                .HasForeignKey(bc => bc.CoachLessonId);
+
+            builder.Entity<CoachLessonLevel>()
+                .HasOne(bc => bc.LessonLevel)
+                .WithMany(c => c.CoachLessons)
+                .HasForeignKey(bc => bc.LessonLevelId);
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(ConnectionString);
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(ConnectionString);
         }
 
         public DbSet<Address> CoachAddresses { get; set; }
@@ -46,5 +62,6 @@ namespace KorepetycjeNaJuz.Infrastructure
         public DbSet<LessonSubject> LessonSubjects { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<CoachLessonLevel> CoachLessonLevels { get; set; }
     }
 }

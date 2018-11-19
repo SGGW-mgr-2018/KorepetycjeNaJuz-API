@@ -31,7 +31,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
 
             lesson.Date = coachLesson.DateEnd;
             lesson.NumberOfHours = (coachLesson.DateEnd - coachLesson.DateStart).Hours;
-            lesson.LessonStatusId = (int)LessonStatuses.WaitingToApprove;
+            lesson.LessonStatusId = (int)LessonStatuses.Reserved;
             await _lessonRepository.AddAsync(lesson);
 
             coachLesson.LessonStatusId = (int)LessonStatuses.Reserved;

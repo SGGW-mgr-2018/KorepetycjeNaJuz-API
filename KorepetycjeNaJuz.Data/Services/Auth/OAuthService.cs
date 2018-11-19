@@ -1,6 +1,8 @@
 ﻿using KorepetycjeNaJuz.Core.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 
@@ -33,5 +35,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Auth
 
             return handler.WriteToken(securityToken);
         }
+
+        public IDictionary<string,string> GetClaims(string token)
+        {
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            return handler.ReadJwtToken(token).Claims.ToDictionary(x => x.Type, x => x.Value);
+        }        
     }
 }
