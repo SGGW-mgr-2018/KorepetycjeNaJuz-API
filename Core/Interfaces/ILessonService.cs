@@ -7,5 +7,6 @@ namespace KorepetycjeNaJuz.Core.Interfaces
     {
         Task CreateLessonAsync(LessonCreateDTO lessonCreateDTO);
         bool IsLessonExists(int lessonId);
+        void RejectLesson(int id);
     }
 }

@@ -41,5 +41,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         {
             return _lessonRepository.GetById(lessonId) != null;
         }
+        public void RejectLesson(int id)
+        {
+            var lesson = _lessonRepository.GetById(id);
+
+            lesson.LessonStatus.Id = (int)LessonStatuses.Rejected;
+        }
     }
 }

@@ -8,6 +8,7 @@ using System;
 using NLog;
 using System.Net;
 using System.Threading.Tasks;
+using KorepetycjeNaJuz.Core.Enums;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -15,15 +16,15 @@ namespace KorepetycjeNaJuz.Controllers
     [Route("api/[controller]")]
     public class LessonController : ControllerBase
     {
-        private readonly ILessonService _lessonService;
+        private readonly ILessonRepository _lessonRepository;
         private readonly ICoachLessonService _coachLessonService;
         private readonly ILogger _logger;
 
         public LessonController(
-            ILessonService lessonService, 
+            ILessonRepository lessonRepository, 
             ICoachLessonService coachLessonService)
         {
-            this._lessonService = lessonService;
+            this._lessonRepository = lessonRepository;
             this._coachLessonService = coachLessonService;
             this._logger = LogManager.GetLogger("apiLogger");
         }
@@ -71,7 +72,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.CreateLessonAsync(lessonCreateDTO);
+                await _lessonRepository.CreateLessonAsync(lessonCreateDTO);
             }
             catch (Exception ex)
             {
@@ -80,6 +81,43 @@ namespace KorepetycjeNaJuz.Controllers
             }
 
             return StatusCode((int)HttpStatusCode.Created);
+        }
+        /// <summary>
+        /// Ustawia status danej lekcji na "odrzucony" (rejected)
+        /// </summary>
+        /// <param name="id">ID lekcji</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie odrzucono lekcję</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
+        [HttpPost, Route("Reject"), Authorize("Bearer")]
+        public IActionResult RejectLesson([Required] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_lessonRepository.IsLessonExists(id))
+                return NotFound();
+
+            if (_lessonRepository.GetById(id).LessonStatus.Id == (int)LessonStatuses.Rejected)
+            {
+                ModelState.AddModelError("LessonStatus", "Lekcja została już odrzucona.");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                _lessonRepository.RejectLesson(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during LessonStatus change");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return StatusCode((int)HttpStatusCode.OK);
         }
     }
 }
