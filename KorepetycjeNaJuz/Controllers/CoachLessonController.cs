@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using KorepetycjeNaJuz.Core.Models;
 using System.Linq;
+using KorepetycjeNaJuz.Core.Enums;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -55,8 +56,8 @@ namespace KorepetycjeNaJuz.Controllers
                 getCoachLessonsByFiltersDTO.DateTo = getCoachLessonsByFiltersDTO.DateFrom.AddDays(1);
 
             IEnumerable<CoachLesson> query = _coachLessonRepository.ListAll().Where(
-                x => x.LessonStatus.Name == "WaitingForStudents" ||
-                x.LessonStatus.Name == "Reserved" &&
+                x => x.LessonStatus.Id == (int)LessonStatuses.WaitingForStudents ||
+                x.LessonStatus.Id == (int)LessonStatuses.Reserved &&
                 x.DateStart >= getCoachLessonsByFiltersDTO.DateFrom &&
                 x.DateEnd <= getCoachLessonsByFiltersDTO.DateTo);
 
@@ -84,7 +85,7 @@ namespace KorepetycjeNaJuz.Controllers
                 foreach (CoachLesson coachLesson in query)
                 {
                     // po odległości
-                    if (distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, getCoachLessonsByFiltersDTO.Latitiude, getCoachLessonsByFiltersDTO.Longitiude) <= getCoachLessonsByFiltersDTO.Radius)
+                    if (distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, getCoachLessonsByFiltersDTO.Latitiude.GetValueOrDefault(), getCoachLessonsByFiltersDTO.Longitiude.GetValueOrDefault()) <= getCoachLessonsByFiltersDTO.Radius)
                     {
                         output.Add(coachLesson);
                     }
