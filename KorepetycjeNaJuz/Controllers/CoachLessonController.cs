@@ -45,31 +45,53 @@ namespace KorepetycjeNaJuz.Controllers
         [HttpPost,Route("GetCoachLessonsByFilters"), AllowAnonymous]
         public IActionResult GetCoachLessonsByFilters([Required] GetCoachLessonsByFiltersDTO getCoachLessonsByFiltersDTO)
         {
+            List<CoachLesson> output;
+
+
+            if (getCoachLessonsByFiltersDTO.DateFrom == null)
+                getCoachLessonsByFiltersDTO.DateFrom = DateTime.Now;
+
+            if (getCoachLessonsByFiltersDTO.DateTo == null)
+                getCoachLessonsByFiltersDTO.DateTo = getCoachLessonsByFiltersDTO.DateFrom.AddDays(1);
+
             IEnumerable<CoachLesson> query = _coachLessonRepository.ListAll().Where(
                 x => x.LessonStatus.Name == "WaitingForStudents" ||
                 x.LessonStatus.Name == "Reserved" &&
                 x.DateStart >= getCoachLessonsByFiltersDTO.DateFrom &&
                 x.DateEnd <= getCoachLessonsByFiltersDTO.DateTo);
 
-            List<CoachLesson> output = new List<CoachLesson>();
-            foreach (CoachLesson coachLesson in query)
+
+            // po tytule
+            if (getCoachLessonsByFiltersDTO.Subject != null)
+                query.Where(x=> x.Subject.Name == getCoachLessonsByFiltersDTO.Subject );
+
+            // po poziomie
+            if (getCoachLessonsByFiltersDTO.Level != null)
+                query.Where(x => x.LessonLevel.LevelName == getCoachLessonsByFiltersDTO.Level);
+
+            // po coachID
+            if (getCoachLessonsByFiltersDTO.CoachId != null)
+                query.Where(x => x.CoachId == getCoachLessonsByFiltersDTO.CoachId);
+
+            if (getCoachLessonsByFiltersDTO.Latitiude == null || getCoachLessonsByFiltersDTO.Longitiude == null || getCoachLessonsByFiltersDTO.Radius == null)
             {
-                // po odległości
-                if (distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude,getCoachLessonsByFiltersDTO.Latitiude,getCoachLessonsByFiltersDTO.Longitiude) <= getCoachLessonsByFiltersDTO.Radius)
+                // dodajemy wszystkie
+                output = query.ToList<CoachLesson>();
+            }
+            else
+            {
+                output = new List<CoachLesson>();
+                foreach (CoachLesson coachLesson in query)
                 {
-                    // subject level 
-                    if (coachLesson.Subject.Name == getCoachLessonsByFiltersDTO.Subject && coachLesson.LessonLevel.LevelName == getCoachLessonsByFiltersDTO.Level)
+                    // po odległości
+                    if (distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, getCoachLessonsByFiltersDTO.Latitiude, getCoachLessonsByFiltersDTO.Longitiude) <= getCoachLessonsByFiltersDTO.Radius)
                     {
-                        if (getCoachLessonsByFiltersDTO.CoachId == 0)
-                        {
-                            output.Add(coachLesson);
-                        }else if (coachLesson.CoachId == getCoachLessonsByFiltersDTO.CoachId)
-                        {
-                            output.Add(coachLesson);
-                        }
+                        output.Add(coachLesson);
                     }
                 }
             }
+
+            
 
             return output.Count < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, output);
         }
