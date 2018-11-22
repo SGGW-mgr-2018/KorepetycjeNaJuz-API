@@ -11,9 +11,9 @@ namespace KorepetycjeNaJuz.Core.Models
         public int CoachId { get; set; }
         public virtual User Coach { get; set; }
 
-        public double? Latitude { get; set; }
+        public double Latitude { get; set; }
 
-        public double? Longitude { get; set; }
+        public double Longitude { get; set; }
 
         [MaxLength(100)]
         public string City { get; set; }
