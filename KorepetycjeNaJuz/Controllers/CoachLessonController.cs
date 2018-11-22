@@ -68,7 +68,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             // po poziomie
             if (getCoachLessonsByFiltersDTO.Level != null)
-                query.Where(x => x.LessonLevel.LevelName == getCoachLessonsByFiltersDTO.Level);
+                query.Where(x => x.LessonLevels.Any(i => i.LessonLevel.LevelName == getCoachLessonsByFiltersDTO.Level));
 
             // po coachID
             if (getCoachLessonsByFiltersDTO.CoachId != null)
