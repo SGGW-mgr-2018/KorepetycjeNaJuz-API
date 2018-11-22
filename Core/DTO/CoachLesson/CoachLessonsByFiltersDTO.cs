@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace KorepetycjeNaJuz.Core.DTO
 {
-    public class GetCoachLessonsByFiltersDTO
+    public class CoachLessonsByFiltersDTO
     {
         public double? Latitiude { get; set; }
 
