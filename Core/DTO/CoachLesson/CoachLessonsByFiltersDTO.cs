@@ -11,15 +11,15 @@ namespace KorepetycjeNaJuz.Core.DTO
 
         public double? Radius { get; set; }
 
-        public string Subject { get; set; }
+        public int? SubjectId { get; set; }
 
-        public string Level { get; set; }
+        public int? LevelId { get; set; }
 
         public int? CoachId { get; set; }
 
-        public DateTime DateFrom { get; set; }
+        public DateTime? DateFrom { get; set; }
 
-        public DateTime DateTo { get; set; }
+        public DateTime? DateTo { get; set; }
 
         [JsonIgnore]
         public int StudentId { get; set; }
