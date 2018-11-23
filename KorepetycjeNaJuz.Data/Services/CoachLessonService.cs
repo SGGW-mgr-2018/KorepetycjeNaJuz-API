@@ -1,5 +1,6 @@
 ﻿using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
+using KorepetycjeNaJuz.Core.Models;
 using System.Linq;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
@@ -46,5 +47,10 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var coachLesson = _coachLessonRepository.GetById(coachLessonId);
             return coachLesson.CoachId == userId;
 ;       }
+
+        public CoachLesson GetById(int id)
+        {
+            return _coachLessonRepository.GetById(id);
+        }
     }
 }

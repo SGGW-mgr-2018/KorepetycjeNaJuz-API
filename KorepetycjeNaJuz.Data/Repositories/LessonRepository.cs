@@ -42,11 +42,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
         {
             return _lessonRepository.GetById(id) != null;
         }
-        public void RejectLesson(int id)
-        {
-            var lesson = _lessonRepository.GetById(id);
+        //public void RejectLesson(int id)
+        //{
+        //    var lesson = _lessonRepository.GetById(id);
 
-            lesson.LessonStatus.Id = (int)LessonStatuses.Rejected;
-        }
+        //    lesson.LessonStatus.Id = (int)LessonStatuses.Rejected;
+        //}
     }
 }

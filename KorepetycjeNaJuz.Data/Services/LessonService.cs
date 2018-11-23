@@ -47,5 +47,24 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
             lesson.LessonStatus.Id = (int)LessonStatuses.Rejected;
         }
+        public Lesson GetById(int id)
+        {
+            return _lessonRepository.GetById(id);
+        }
+        public void ApproveLesson(LessonAcceptDTO lessonAcceptDTO)
+        {
+            var selectedLesson = _lessonRepository.GetById(lessonAcceptDTO.LessonId);
+            var coachLesson = _coachLessonRepository.GetById(lessonAcceptDTO.CoachLessonId);
+
+            foreach (var lesson in coachLesson.Lessons)
+            {
+                if (lesson.Id == lessonAcceptDTO.LessonId)
+                    selectedLesson.LessonStatus.Id = (int)LessonStatuses.Approved;
+                else
+                    lesson.LessonStatusId = (int)LessonStatuses.Rejected;
+            }
+
+            coachLesson.LessonStatus.Id = (int)LessonStatuses.Approved;
+        }
     }
 }
