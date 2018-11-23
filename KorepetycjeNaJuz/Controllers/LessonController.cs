@@ -130,7 +130,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="401">Wymagana autoryzacja</response>
         /// <response code="404">Podana rezerwacja nie istnieje</response>
         [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
-        [HttpPost, Route("Accept"), Authorize("Bearer")]
+        [HttpPost, Route("Approve"), Authorize("Bearer")]
         public IActionResult ApproveLesson([Required] LessonAcceptDTO lessonAcceptDTO)
         {
             if (!ModelState.IsValid)
