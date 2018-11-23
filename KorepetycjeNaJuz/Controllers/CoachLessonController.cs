@@ -41,8 +41,8 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="200">Lista dostępnych lekcji</response>
         /// <response code="404">Nie znaleziono lekcji o podanych kryteriach</response>
         [ProducesResponseType(typeof(CoachLesson), 200), ProducesResponseType(404)]
-        [HttpPost, Route("GetCoachLessonsByFilters"), AllowAnonymous]
-        public IActionResult GetCoachLessonsByFilters([Required] CoachLessonsByFiltersDTO model)
+        [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]
+        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO model)
         {
             List<CoachLesson> output;
 

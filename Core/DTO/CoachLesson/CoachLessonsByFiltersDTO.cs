@@ -21,7 +21,6 @@ namespace KorepetycjeNaJuz.Core.DTO
 
         public DateTime? DateTo { get; set; }
 
-        [JsonIgnore]
-        public int StudentId { get; set; }
+        public int? StudentId { get; set; }
     }
 }
