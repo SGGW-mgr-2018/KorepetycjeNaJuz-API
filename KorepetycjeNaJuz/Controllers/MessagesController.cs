@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -46,12 +47,14 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during Message download");
                 return NotFound();
             }
-        }/// <summary>
-         /// Pobiera konwersacje użytkownika
-         /// </summary>
-         /// <returns></returns>
+        }
+        /// <summary>
+        /// Pobiera konwersacje użytkownika
+        /// </summary>
+        /// <returns></returns>
         //[Authorize("Bearer")]
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<ConversationDTO>), 200), ProducesResponseType(404)]
         public async Task<IActionResult> GetConversations()
         {
             try

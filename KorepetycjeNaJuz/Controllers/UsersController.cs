@@ -1,17 +1,17 @@
-﻿using System;
-using NLog;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using KorepetycjeNaJuz.Core.DTO;
+using KorepetycjeNaJuz.Core.DTO.User;
+using KorepetycjeNaJuz.Core.Interfaces;
+using KorepetycjeNaJuz.Core.Models;
+using KorepetycjeNaJuz.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using KorepetycjeNaJuz.Core.Models;
-using KorepetycjeNaJuz.Infrastructure;
-using KorepetycjeNaJuz.Core.DTO;
-using KorepetycjeNaJuz.Core.Interfaces;
+using NLog;
+using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -109,7 +109,7 @@ namespace KorepetycjeNaJuz.Controllers
                 user.PhoneNumberConfirmed = false;
             else
                 user.PhoneNumberConfirmed = true;
-            
+
             _context.Entry(user).State = EntityState.Modified;
 
             try { await _context.SaveChangesAsync(); }
@@ -123,7 +123,7 @@ namespace KorepetycjeNaJuz.Controllers
             _logger.Info(string.Format("User with id={0} has been modified.", id));
 
             return NoContent();
-        }
+        }        
 
         /// <summary>
         /// Rejestracja użytkownika w bazie danych
@@ -187,6 +187,52 @@ namespace KorepetycjeNaJuz.Controllers
             _logger.Info(string.Format("User with id={0} has been deleted.", id));
 
             return Ok(user);
+        }
+        
+        /// <summary>
+        /// Akceptacja regulaminów przez użytkownika.
+        /// </summary>
+        /// <param name="policy">Udzielone zgody</param>
+        /// <returns></returns>
+        [ProducesResponseType(200), ProducesResponseType(500)]
+        [HttpPut, Route("UpdateUserPolicy")]
+        //[Authorize("Bearer")]
+        public async Task<IActionResult> UpdateUserAcceptancePolicy([FromBody]PolicyDTO policy)
+        {
+            try
+            {
+                var currentUserId = 1;// User.GetUserId().Value;
+                if (policy.AcceptPrivacy) await _userService.AcceptPrivacy(currentUserId);
+                if (policy.AcceptRODO) await _userService.AcceptRODO(currentUserId);
+                if (policy.AcceptCookies) await _userService.AcceptCookies(currentUserId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during Message creation");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        
+        /// <summary>
+        /// Zresetowanie zgód użytkowników po zmianie regulaminów.
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(200), ProducesResponseType(500)]
+        [HttpPut]
+        //[Authorize("Admin")]
+        public async Task<IActionResult> UpgradePolicy()
+        {
+            try
+            {
+                await _userService.ClearPolicyAcceptanceAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during Message creation");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
         }
 
         public class UserControllerException : ApplicationException
