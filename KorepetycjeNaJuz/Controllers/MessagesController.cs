@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -46,21 +47,24 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during Message download");
                 return NotFound();
             }
-        }/// <summary>
-         /// Pobiera konwersacje użytkownika
-         /// </summary>
-         /// <returns></returns>
+        }
+
+        /// <summary>
+        /// Pobiera konwersacje użytkownika
+        /// </summary>
+        /// <returns></returns>
         [Authorize("Bearer")]
         [HttpGet]
-        public IActionResult GetConversations()
+        [ProducesResponseType(typeof(IEnumerable<ConversationDTO>), 200), ProducesResponseType(404)]
+        public async Task<IActionResult> GetConversations()
         {
             try
             {
                 var currentUserId = User.GetUserId().Value;
                 var conversation = _context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
                     .GroupBy(m => m.OwnerId == currentUserId ? m.RecipientId : m.OwnerId);
-                var usersId = conversation.Select(c => c.Key).ToList();
-                var users = _context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionary(u => u.Id);
+                var usersId = await conversation.Select(c => c.Key).ToListAsync();
+                var users = await _context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
                 
                 return Ok(_context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
                     .GroupBy(m=>m.OwnerId==currentUserId?m.RecipientId:m.OwnerId).Select(g => ConversationDTO.Create(g, users)));
@@ -116,6 +120,6 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during Message creation");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }        
     }
 }
