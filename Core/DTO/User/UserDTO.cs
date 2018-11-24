@@ -36,5 +36,10 @@
         /// Zdjęcie/avatar użytkownika
         /// </summary>
         public byte[] Avatar { get; set; }
+        public bool RodoConfirmed { get; set; }
+
+        public bool CookiesConfirmed { get; set; }
+
+        public bool PrivacyPolicesConfirmed { get; set; }
     }
 }

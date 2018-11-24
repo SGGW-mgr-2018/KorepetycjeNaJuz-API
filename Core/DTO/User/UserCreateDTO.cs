@@ -34,5 +34,12 @@ namespace KorepetycjeNaJuz.Core.DTO
         [Range(typeof(bool), "true", "true", ErrorMessage = "Musisz zaakceptować regulamin serwisu.")]
         [Required(ErrorMessage = "To pole jest wymagane.")]
         public bool PrivacyPolicesConfirmed { get; set; }
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Musisz wyrazić zgodę na przetwarzanie danych osobowych.")]
+        [Required(ErrorMessage = "To pole jest wymagane.")]
+        public bool RODOPolicesConfirmed { get; set; }
+        
+        [Required(ErrorMessage = "To pole jest wymagane.")]
+        public bool CookiesPolicesConfirmed { get; set; }
     }
 }

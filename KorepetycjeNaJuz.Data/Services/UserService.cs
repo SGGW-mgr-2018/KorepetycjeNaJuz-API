@@ -3,11 +3,11 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
 using NLog;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
 {
@@ -27,6 +27,26 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             this._mapper = mapper;
             this._userManager = userManager;
             this._logger = LogManager.GetLogger("apiLogger");
+        }
+
+        public async Task AcceptCookies(int userId)
+        {
+            await _userRepository.AcceptCookies(userId);
+        }
+
+        public async Task AcceptPrivacy(int userId)
+        {
+            await _userRepository.AcceptPrivacy(userId);
+        }
+
+        public async Task AcceptRODO(int userId)
+        {
+            await _userRepository.AcceptRODO(userId);
+        }
+
+        public async Task ClearPolicyAcceptanceAsync()
+        {
+            await _userRepository.ClearPolicyAcceptanceAsync();            
         }
 
         public async Task<bool> CreateUserAsync(UserCreateDTO userCreateDTO)
