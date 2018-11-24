@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NLog;
+using KorepetycjeNaJuz.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +19,15 @@ namespace KorepetycjeNaJuz.Controllers
     [ApiController]
     public class MessagesController : ControllerBase
     {
-        private readonly KorepetycjeContext _context;
         private readonly Logger _logger;
+        private readonly IMessageService _messageService;
+        private readonly IUserService _userService;
 
-        public MessagesController(KorepetycjeContext context)
+        public MessagesController(IMessageService messageService, IUserService userService)
         {
-            _context = context;
             _logger = LogManager.GetLogger("apiLogger");
+            _messageService = messageService;
+            _userService = userService;
         }
 
         /// <summary>
@@ -34,12 +37,12 @@ namespace KorepetycjeNaJuz.Controllers
         /// <returns></returns>
         //[Authorize("Bearer")]
         [HttpGet("{id}")]
-        public IActionResult GetConversationWithUser([FromRoute] int id)
+        public async Task<IActionResult> GetConversationWithUser([FromRoute] int id)
         {
             try
             {
                 var currentUserId = 1;// User.GetUserId().Value;
-                return Ok(_context.Messages.Where(m => m.RecipientId == currentUserId && m.OwnerId == id || m.RecipientId == id && m.OwnerId == currentUserId)
+                return Ok((await _messageService.GetConversationWithUserAsync(currentUserId, id))
                     .Select(m => new MessageDTO(m)));
             }
             catch (Exception ex)
@@ -60,13 +63,10 @@ namespace KorepetycjeNaJuz.Controllers
             try
             {
                 var currentUserId = 1;// User.GetUserId().Value;
-                var conversation = _context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
-                    .GroupBy(m => m.OwnerId == currentUserId ? m.RecipientId : m.OwnerId);
-                var usersId = await conversation.Select(c => c.Key).ToListAsync();
-                var users = await _context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
-                
-                return Ok(_context.Messages.AsNoTracking().Where(m => m.RecipientId == currentUserId || m.OwnerId == currentUserId)
-                    .GroupBy(m=>m.OwnerId==currentUserId?m.RecipientId:m.OwnerId).Select(g => ConversationDTO.Create(g, users)));
+                var users = await _messageService.GetInterlocutorsAsync(currentUserId);//_context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
+
+
+                return Ok((await _messageService.GetConversation(currentUserId)).Select(g => ConversationDTO.Create(g, users)));
             }
             catch (Exception ex)
             {
@@ -95,7 +95,7 @@ namespace KorepetycjeNaJuz.Controllers
                     return BadRequest(ModelState);
                 }
 
-                if (! await _context.Users.AnyAsync(u=>u.Id==message.RecipientId))
+                if (! await _userService.IsUserExistsAsync(message.RecipientId))
                 {
                     ModelState.AddModelError("RecipientId", "Użytkownik z takim Id nie istnieje.");
                     return BadRequest(ModelState);
@@ -103,14 +103,13 @@ namespace KorepetycjeNaJuz.Controllers
 
                 var currentUserId = 1;// User.GetUserId().Value;
 
-                await _context.Messages.AddAsync(new Message
+                await _messageService.AddMessageAsync(new Message
                 {
                     DateOfSending = now,
                     OwnerId = currentUserId,
                     RecipientId = message.RecipientId,
                     Content = message.Content
                 });
-                await _context.SaveChangesAsync();
 
                 return StatusCode((int)HttpStatusCode.Created);
             }
@@ -133,7 +132,7 @@ namespace KorepetycjeNaJuz.Controllers
             try
             {
                 var currentUserId = 1;// User.GetUserId().Value;
-                var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
+                var message = await _messageService.GetMessageAsync(id);
                 if (message==null)
                 {
                     ModelState.AddModelError("id", "Wiadomość z podanym id nie istnieje.");
@@ -144,8 +143,7 @@ namespace KorepetycjeNaJuz.Controllers
                     ModelState.AddModelError("id", "Użytkownik nie może usuwać cudze wiadomości.");
                     return BadRequest(ModelState);
                 }
-                _context.Messages.Remove(message);
-                await _context.SaveChangesAsync();
+                await _messageService.RemoveAsync(message.Id);
                 return StatusCode((int)HttpStatusCode.OK);
             }
             catch(Exception ex)
