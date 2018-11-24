@@ -44,7 +44,10 @@ namespace KorepetycjeNaJuz.Controllers
         [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]
         public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO model)
         {
-            List<CoachLesson> output;
+            List<CoachLessonDTO> output;
+
+
+            CoachLessonDTO a = _coachLessonService.MapCoachLessonDTO( new CoachLesson());
 
             if (model.DateFrom == null)
                 model.DateFrom = DateTime.Now;
@@ -73,18 +76,18 @@ namespace KorepetycjeNaJuz.Controllers
             if (model.Latitiude == null || model.Longitiude == null || model.Radius == null)
             {
                 // dodajemy wszystkie
-                output = query.ToList();
+                output = _coachLessonService.MapCoachLessonsDTO( query.ToList()).ToList<CoachLessonDTO>();
             }
             else
             {
-                output = new List<CoachLesson>();
+                output = new List<CoachLessonDTO>();
                 foreach (CoachLesson coachLesson in query)
                 {
                     // po odległości
                     var distance = Distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, model.Latitiude.Value, model.Longitiude.Value);
                     if (distance <= model.Radius)
                     {
-                        output.Add(coachLesson);
+                        output.Add(_coachLessonService.MapCoachLessonDTO( coachLesson));
                     }
                 }
             }
