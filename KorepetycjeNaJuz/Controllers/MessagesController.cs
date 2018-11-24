@@ -28,41 +28,6 @@ namespace KorepetycjeNaJuz.Controllers
         }
 
         /// <summary>
-        /// Usuwa wiadomość o podanym id
-        /// </summary>
-        /// <param name="id">Id wiadomości</param>
-        /// <returns></returns>
-        [HttpDelete("{id}")]
-        [ProducesResponseType(200), ProducesResponseType(400)]
-        [Authorize("Bearer")]
-        public async Task<IActionResult> DeleteMessage(int id)
-        {
-            try
-            {
-                var currentUserId = User.GetUserId().Value;
-                var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
-                if (message == null)
-                {
-                    ModelState.AddModelError("id", "Wiadomość z podanym id nie istnieje.");
-                    return BadRequest(ModelState);
-                }
-                if (message.RecipientId != currentUserId && message.OwnerId != currentUserId)
-                {
-                    ModelState.AddModelError("id", "Użytkownik nie może usuwać cudze wiadomości.");
-                    return BadRequest(ModelState);
-                }
-                _context.Messages.Remove(message);
-                await _context.SaveChangesAsync();
-                return StatusCode((int)HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex, "Error during Message removal");
-                return StatusCode((int)HttpStatusCode.InternalServerError);
-            }
-        }
-
-        /// <summary>
         /// Pobiera konwersację z użytkownikiem
         /// </summary>
         /// <param name="id">Id rozmówcy</param>
