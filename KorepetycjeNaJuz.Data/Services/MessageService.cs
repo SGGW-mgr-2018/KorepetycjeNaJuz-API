@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
 {
-    class MessageService : IMessageService
+    public class MessageService : IMessageService
     {
         private IMessageRepository _messageRepository;
 

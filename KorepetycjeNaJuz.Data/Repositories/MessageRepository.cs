@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Repositories
 {
-    class MessageRepository : GenericRepository<Message>, IMessageRepository
+    public class MessageRepository : GenericRepository<Message>, IMessageRepository
     {
         private readonly KorepetycjeContext _context;
 
@@ -24,9 +24,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public Task<Dictionary<int, User>> GetInterlocutorsAsync(int userId)
+        public async Task<Dictionary<int, User>> GetInterlocutorsAsync(int userId)
         {
-            throw new System.NotImplementedException();
+            var recipients = await _dbSet.AsNoTracking().Where(m => m.OwnerId == userId).Select(m => m.Recipient).Distinct().ToListAsync();
+            var owners = await _dbSet.AsNoTracking().Where(m => m.RecipientId == userId).Select(m => m.Owner).Distinct().ToListAsync();
+            return recipients.Union(owners).Distinct().ToDictionary(u => u.Id);
         }
 
         public Task<List<Message>> GetUserMessagesAsync(int userId)
