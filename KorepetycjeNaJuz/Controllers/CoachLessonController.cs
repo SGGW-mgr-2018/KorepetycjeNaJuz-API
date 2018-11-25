@@ -6,9 +6,8 @@ using System.ComponentModel.DataAnnotations;
 using System;
 using NLog;
 using System.Collections.Generic;
-using KorepetycjeNaJuz.Core.Models;
 using System.Linq;
-using KorepetycjeNaJuz.Core.Enums;
+using System.Net;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -18,17 +17,14 @@ namespace KorepetycjeNaJuz.Controllers
     {
         private readonly ILessonService _lessonService;
         private readonly ICoachLessonService _coachLessonService;
-        private readonly ICoachLessonRepository _coachLessonRepository;
         private readonly ILogger _logger;
 
         public CoachLessonController(
             ILessonService lessonService, 
-            ICoachLessonService coachLessonService,
-            ICoachLessonRepository coachLessonRepository)
+            ICoachLessonService coachLessonService)
         {
             this._lessonService = lessonService;
             this._coachLessonService = coachLessonService;
-            this._coachLessonRepository = coachLessonRepository;
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
@@ -36,84 +32,33 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Metoda wyszukująca lekcje po zadanych filtrach.
         /// </summary>
-        /// <param name="model">Dane lekcji</param>
-        /// <returns>Wygenerowany token JWT</returns>
+        /// <param name="filters">Dane lekcji</param>
+        /// <returns></returns>
         /// <response code="200">Lista dostępnych lekcji</response>
+        /// <response code="400">Błedne parametry</response>
         /// <response code="404">Nie znaleziono lekcji o podanych kryteriach</response>
-        [ProducesResponseType(typeof(CoachLesson), 200), ProducesResponseType(404)]
+        /// <response code="500">Błąd wewnętrzny</response>
+        [ProducesResponseType(typeof(IEnumerable<CoachLessonDTO>), 200)]
+        [ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(500)]
         [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]
-        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO model)
+        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO filters)
         {
-            List<CoachLessonDTO> output;
-
-
-            CoachLessonDTO a = _coachLessonService.MapCoachLessonDTO( new CoachLesson());
-
-            if (model.DateFrom == null)
-                model.DateFrom = DateTime.Now;
-
-            if (model.DateTo == null)
-                model.DateTo = model.DateFrom.Value.AddDays(1);
-
-            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x => 
-                (x.LessonStatus.Id == (int)LessonStatuses.WaitingForStudents || 
-                 x.LessonStatus.Id == (int)LessonStatuses.Reserved) &&
-                x.DateStart >= model.DateFrom && 
-                x.DateEnd <= model.DateTo);
-
-            // po tytule
-            if (model.SubjectId != null)
-                query = query.Where(x => x.Subject.Id == model.SubjectId.Value);
-
-            // po poziomie
-            if (model.LevelId != null)
-                query = query.Where(x => x.LessonLevels.Any(i => i.LessonLevel.Id == model.LevelId.Value));
-
-            // po coachID
-            if (model.CoachId != null)
-                query = query.Where(x => x.CoachId == model.CoachId.Value);
-
-            if (model.Latitiude == null || model.Longitiude == null || model.Radius == null)
+            if (!ModelState.IsValid)
             {
-                // dodajemy wszystkie
-                output = _coachLessonService.MapCoachLessonsDTO( query.ToList()).ToList<CoachLessonDTO>();
-            }
-            else
-            {
-                output = new List<CoachLessonDTO>();
-                foreach (CoachLesson coachLesson in query)
-                {
-                    // po odległości
-                    var distance = Distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, model.Latitiude.Value, model.Longitiude.Value);
-                    if (distance <= model.Radius)
-                    {
-                        output.Add(_coachLessonService.MapCoachLessonDTO( coachLesson));
-                    }
-                }
+                return BadRequest();
             }
 
-            return output.Any() ? StatusCode(200, output) : NotFound("Lessons not found.");
-        }
+            try
+            {
+                var output = _coachLessonService.GetCoachLessonsByFilters(filters);
 
-        private double Distance(double lat1, double lon1, double lat2, double lon2)
-        {
-            double theta = lon1 - lon2;
-            double dist = Math.Sin(Deg2rad(lat1)) * Math.Sin(Deg2rad(lat2)) + Math.Cos(Deg2rad(lat1)) * Math.Cos(Deg2rad(lat2)) * Math.Cos(Deg2rad(theta));
-            dist = Math.Acos(dist);
-            dist = Rad2deg(dist);
-            dist = dist * 60 * 1.1515;
-            dist = dist * 1.609344; // to kilomiters
-            return (dist);
-        }
-
-        private double Deg2rad(double deg)
-        {
-            return (deg * Math.PI / 180.0);
-        }
-
-        private double Rad2deg(double rad)
-        {
-            return (rad / Math.PI * 180.0);
+                return output.Any() ? StatusCode(200, output) : NotFound("Lessons not found.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during GetCoachLessonsByFilters");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }  
         }
     }
 }
