@@ -32,5 +32,13 @@ namespace KorepetycjeNaJuz.Core.Models
         public bool CookiesConfirmed { get; set; }
 
         public bool PrivacyPolicesConfirmed { get; set; }
+        public override bool Equals(object obj)
+        {
+            return (obj is User user) && user.Id == Id;
+        }
+        public override int GetHashCode()
+        {
+            return Id;
+        }
     }
 }
