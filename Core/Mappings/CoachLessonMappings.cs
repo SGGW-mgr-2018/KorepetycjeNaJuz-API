@@ -9,18 +9,16 @@ namespace KorepetycjeNaJuz.Core.Mappings
     {
         public CoachLessonMappings()
         {
-            CreateMap<CoachLessonDTO, CoachLesson>()
-                .ForPath(x => x.Subject.Name, opts => opts.MapFrom(i => i.LessonSubject));
-            CreateMap<CoachLessonDTO, CoachLesson>()
-                .ForPath(x => x.Address.Latitude, opts => opts.MapFrom(i => i.Latitude));
-            CreateMap<CoachLessonDTO, CoachLesson>()
-                .ForPath(x => x.Address.Longitude, opts => opts.MapFrom(i => i.Longitude));
-            CreateMap<CoachLessonDTO, CoachLesson>()
-                .ForPath(x => x.Address.City, opts => opts.MapFrom(i => i.City));
-            CreateMap<CoachLessonDTO, CoachLesson>()
-                .ForPath(x => x.Address.Street, opts => opts.MapFrom(i => i.Street));
+            CreateMap<CoachLesson, CoachLessonDTO>()
+                .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name))
+                .ForMember(x => x.Latitude, opts => opts.MapFrom(i => i.Address.Latitude))
+                .ForMember(x => x.Longitude, opts => opts.MapFrom(i => i.Address.Longitude))
+                .ForMember(x => x.City, opts => opts.MapFrom(i => i.Address.City))
+                .ForMember(x => x.Street, opts => opts.MapFrom(i => i.Address.Street));
 
-            CreateMap<CoachLesson, CoachLessonDTO>().ReverseMap(); // Two-way map
+            CreateMap<CoachLessonLevel, CoachLessonLevelDTO>()
+                .ForMember(x => x.Id, opts => opts.MapFrom(i => i.LessonLevel.Id))
+                .ForMember(x => x.Name, opts => opts.MapFrom(i => i.LessonLevel.LevelName));
         }
     }
 }

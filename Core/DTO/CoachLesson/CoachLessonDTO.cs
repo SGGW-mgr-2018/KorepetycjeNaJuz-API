@@ -16,7 +16,7 @@ namespace KorepetycjeNaJuz.Core.DTO
 
         public string LessonStatusName { get; set; }
 
-        public virtual ICollection<CoachLessonLevel> LessonLevels { get; set; }
+        public ICollection<CoachLessonLevelDTO> LessonLevels { get; set; }
 
         public int LessonSubjectId { get; set; }
 
