@@ -35,13 +35,13 @@ namespace KorepetycjeNaJuz.Controllers
         /// </summary>
         /// <param name="id">Id rozmówcy</param>
         /// <returns></returns>
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConversationWithUser([FromRoute] int id)
         {
             try
             {
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
                 return Ok((await _messageService.GetConversationWithUserAsync(currentUserId, id))
                     .Select(m => new MessageDTO(m)));
             }
@@ -55,14 +55,14 @@ namespace KorepetycjeNaJuz.Controllers
         /// Pobiera konwersacje użytkownika
         /// </summary>
         /// <returns></returns>
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ConversationDTO>), 200), ProducesResponseType(404)]
         public async Task<IActionResult> GetConversations()
         {
             try
             {
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
                 var users = await _messageService.GetInterlocutorsAsync(currentUserId);//_context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
 
 
@@ -84,7 +84,7 @@ namespace KorepetycjeNaJuz.Controllers
         // POST: api/Messages
         [HttpPost]
         [ProducesResponseType(201), ProducesResponseType(400)]
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDTO message)
         {
             try
@@ -101,7 +101,7 @@ namespace KorepetycjeNaJuz.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
 
                 await _messageService.AddMessageAsync(new Message
                 {
@@ -126,12 +126,12 @@ namespace KorepetycjeNaJuz.Controllers
         /// <returns></returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(200), ProducesResponseType(400)]
-        //[Authorize("Bearer")]
+        [Authorize("Bearer")]
         public async Task<IActionResult> DeleteMessage(int id)
         {
             try
             {
-                var currentUserId = 1;// User.GetUserId().Value;
+                var currentUserId = User.GetUserId().Value;
                 var message = await _messageService.GetMessageAsync(id);
                 if (message==null)
                 {
