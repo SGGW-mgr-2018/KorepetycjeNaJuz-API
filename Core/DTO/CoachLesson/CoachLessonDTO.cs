@@ -28,13 +28,6 @@ namespace KorepetycjeNaJuz.Core.DTO
         
         public DateTime DateEnd { get; set; }
 
-        public double Latitude { get; set; }
-
-        public double Longitude { get; set; }
-
-        public string City { get; set; }
-
-        public string Street { get; set; }
-
+        public AddressDTO Address { get; set; }
     }
 }
