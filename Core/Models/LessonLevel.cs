@@ -1,4 +1,5 @@
 ﻿using KorepetycjeNaJuz.Core.Interfaces;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace KorepetycjeNaJuz.Core.Models
@@ -10,5 +11,7 @@ namespace KorepetycjeNaJuz.Core.Models
 
         [MaxLength(255)]
         public string LevelName { get; set; }
+
+        public virtual ICollection<CoachLessonLevel> CoachLessons { get; set; }
     }
 }

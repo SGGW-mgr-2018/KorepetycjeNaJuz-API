@@ -1,6 +1,7 @@
 ﻿using KorepetycjeNaJuz.Core.Interfaces;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
@@ -18,8 +19,7 @@ namespace KorepetycjeNaJuz.Core.Models
         public int LessonSubjectId { get; set; }
         public virtual LessonSubject Subject { get; set; }
 
-        public int LessonLevelId { get; set; }
-        public virtual LessonLevel LessonLevel { get; set; }
+        public virtual ICollection<CoachLessonLevel> LessonLevels { get; set; }
 
         public decimal RatePerHour { get; set; }
 
