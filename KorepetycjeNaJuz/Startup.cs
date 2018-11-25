@@ -60,6 +60,7 @@ namespace KorepetycjeNaJuz
             services.AddScoped<ILessonSubjectService, LessonSubjectService>();
             services.AddScoped<ICoachLessonService, CoachLessonService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IMessageService, MessageService>();
         }
 
         private void RegisterRepositories(IServiceCollection services)
@@ -68,6 +69,7 @@ namespace KorepetycjeNaJuz
             services.AddScoped<ILessonSubjectRepository, LessonSubjectRepository>();
             services.AddScoped<ICoachLessonRepository, CoachLessonRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
