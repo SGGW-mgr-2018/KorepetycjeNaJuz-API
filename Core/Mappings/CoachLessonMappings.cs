@@ -16,6 +16,13 @@ namespace KorepetycjeNaJuz.Core.Mappings
                 .ForMember(x => x.Id, opts => opts.MapFrom(i => i.LessonLevel.Id))
                 .ForMember(x => x.Name, opts => opts.MapFrom(i => i.LessonLevel.LevelName));
 
+            CreateMap<CoachLessonLevelDTO, CoachLessonLevel>().ReverseMap();
+
+            CreateMap<CoachLessonDTO, CoachLesson>()
+                .ForMember(x => x.RatePerHour, opts => opts.MapFrom(i => i.RatePerHour))
+                .ForMember(x => x.CoachId, opts => opts.MapFrom(i => i.CoachId))
+                .ForMember(x => x.LessonSubjectId, opts => opts.MapFrom(i => i.LessonSubjectId))
+                .ForMember(x => x.LessonLevels, opts => opts.Ignore());
         }
     }
 }

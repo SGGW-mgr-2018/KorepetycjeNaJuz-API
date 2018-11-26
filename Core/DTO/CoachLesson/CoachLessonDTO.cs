@@ -64,5 +64,10 @@ namespace KorepetycjeNaJuz.Core.DTO
         /// Informacje o adresie lekcji(ogłoszenia)
         /// </summary>
         public AddressDTO Address { get; set; }
+
+        /// <summary>
+        /// Informacja o czasie trwania lekcji(ogłoszenia)
+        /// </summary>
+        public int Time { get; set; }
     }
 }

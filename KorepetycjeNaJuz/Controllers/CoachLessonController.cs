@@ -8,6 +8,8 @@ using NLog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using KorepetycjeNaJuz.Core.Exceptions;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -17,14 +19,20 @@ namespace KorepetycjeNaJuz.Controllers
     {
         private readonly ILessonService _lessonService;
         private readonly ICoachLessonService _coachLessonService;
+        private readonly ILessonSubjectService _lessonSubjectService;
+        private readonly ILessonLevelRepository _lessonLevelRepository;
         private readonly ILogger _logger;
 
         public CoachLessonController(
-            ILessonService lessonService, 
-            ICoachLessonService coachLessonService)
+            ILessonService lessonService,
+            ICoachLessonService coachLessonService,
+            ILessonSubjectService lessonSubjectService,
+            ILessonLevelRepository lessonLevelRepository)
         {
             this._lessonService = lessonService;
             this._coachLessonService = coachLessonService;
+            this._lessonSubjectService = lessonSubjectService;
+            this._lessonLevelRepository = lessonLevelRepository;
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
@@ -58,7 +66,58 @@ namespace KorepetycjeNaJuz.Controllers
             {
                 _logger.Error(ex, "Error during GetCoachLessonsByFilters");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
-            }  
+            }
         }
+
+        /// <summary>
+        /// Metoda wyszukująca lekcje po zadanych filtrach.
+        /// </summary>
+        /// <param name="coachLessonDTO">Dane lekcji</param>
+        /// <returns></returns>
+        /// <response code="201">Stworzono CoachLesson</response>
+        /// <response code="400">Błedne parametry</response>
+        /// <response code="409">Czas jest już zajęty</response>
+        [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
+        [HttpPost, Route("AddNewCoachLesson"), Authorize("Bearer")]
+        public async Task<IActionResult> AddNewCoachLesson(CoachLessonDTO coachLessonDTO)
+        {
+            if (coachLessonDTO == null)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest);
+            }
+
+            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart, coachLessonDTO.DateEnd))
+            {
+                return StatusCode((int)HttpStatusCode.Conflict);
+            }
+
+            TimeSpan span = coachLessonDTO.DateEnd.Subtract(coachLessonDTO.DateStart);
+            if (((int)span.TotalMinutes) == coachLessonDTO.Time)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest);
+            }
+
+            try
+            {
+                await _lessonSubjectService.GetAsync(coachLessonDTO.LessonSubjectId);
+            }
+            catch (IdDoesNotExistException)
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest);
+            }
+
+            foreach (var item in coachLessonDTO.LessonLevels)
+            {
+                if (!_lessonLevelRepository.Query().Any(x => x.Id == item.Id))
+                {
+                    return StatusCode((int)HttpStatusCode.BadRequest);
+                } 
+            }
+
+            await _coachLessonService.AddNewCoachLesson(coachLessonDTO);
+
+            return StatusCode((int)HttpStatusCode.Created);
+        }
+
     }
 }
