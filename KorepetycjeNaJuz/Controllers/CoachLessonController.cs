@@ -72,35 +72,35 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Dodaje nowe ogłoszenie lekcji (coachLesson)
         /// </summary>
-        /// <param name="model">Dane lekcji</param>
+        /// <param name="coachLessonDTO">Dane lekcji</param>
         /// <returns></returns>
         /// <response code="201">Stworzono CoachLesson</response>
         /// <response code="400">Błedne parametry</response>
         /// <response code="409">Czas jest już zajęty</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
-        [HttpPost, Route("Create"), Authorize("Bearer")]
-        public async Task<IActionResult> AddCoachLesson([Required, FromBody] CoachLessonCreateDTO coachLessonDTO)
+        [HttpPost, Route("Create"), AllowAnonymous /*Authorize("Bearer")*/]
+        public async Task<IActionResult> CreateCoachLesson([Required, FromBody] CoachLessonCreateDTO coachLessonDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (!_coachLessonService.IsTimeAvailable(model.CoachId, model.DateStart.Value, model.DateEnd.Value))
+            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart.Value, coachLessonDTO.DateEnd.Value))
             {
                 return StatusCode((int)HttpStatusCode.Conflict);
             }
 
-            TimeSpan span = model.DateEnd.Value.Subtract(model.DateStart.Value);
-            if (((int)span.TotalMinutes) == model.Time)
+            TimeSpan span = coachLessonDTO.DateEnd.Value.Subtract(coachLessonDTO.DateStart.Value);
+            if ((span.TotalMinutes % coachLessonDTO.Time != 0))
             {
-                ModelState.AddModelError("Time", "Zbyt długi czas lekcji, aby utworzyć lekcję w zadanym przedziale czasowym");
+                ModelState.AddModelError("Time", "Nie da się poprawnie rozłożyć lekcji w danym przedziale czasowym.");
                 return BadRequest(ModelState);
             }
 
             try
             {
-                await _lessonSubjectService.GetAsync(model.LessonSubjectId);
+                await _lessonSubjectService.GetAsync(coachLessonDTO.LessonSubjectId);
             }
             catch (IdDoesNotExistException)
             {
@@ -108,7 +108,7 @@ namespace KorepetycjeNaJuz.Controllers
                 return BadRequest(ModelState);
             }
 
-            foreach (var levelId in model.LessonLevels)
+            foreach (var levelId in coachLessonDTO.LessonLevels)
             {
                 if (!_lessonLevelRepository.Query().Any(x => x.Id == levelId))
                 {
@@ -117,7 +117,7 @@ namespace KorepetycjeNaJuz.Controllers
                 } 
             }
 
-            await _coachLessonService.AddCoachLesson(coachLessonDTO);
+            await _coachLessonService.CreateCoachLesson(coachLessonDTO);
 
             return StatusCode((int)HttpStatusCode.Created);
         }

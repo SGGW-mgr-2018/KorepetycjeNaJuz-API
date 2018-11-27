@@ -138,10 +138,10 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         {
             return !_coachLessonRepository.Query()
                 .Where(c => c.CoachId == coachID)
-                .Any(x => ((x.DateStart >= startDate && x.DateStart <= endDate) || (x.DateEnd >= startDate && x.DateEnd <= endDate)));
+                .Any(x => ((x.DateStart > startDate && x.DateStart < endDate) || (x.DateEnd > startDate && x.DateEnd < endDate)));
         }
 
-        public async Task AddCoachLesson(AddCoachLessonDTO coachLessonDTO)
+        public async Task CreateCoachLesson(CoachLessonCreateDTO coachLessonDTO)
         {
             Address address = _mapper.Map<Address>(coachLessonDTO.Address);
             address.CoachId = coachLessonDTO.CoachId;
