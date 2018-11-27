@@ -70,51 +70,51 @@ namespace KorepetycjeNaJuz.Controllers
         }
 
         /// <summary>
-        /// Metoda wyszukująca lekcje po zadanych filtrach.
+        /// Dodaje nowe ogłoszenie lekcji (coachLesson)
         /// </summary>
-        /// <param name="coachLessonDTO">Dane lekcji</param>
+        /// <param name="model">Dane lekcji</param>
         /// <returns></returns>
         /// <response code="201">Stworzono CoachLesson</response>
         /// <response code="400">Błedne parametry</response>
         /// <response code="409">Czas jest już zajęty</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
-        [HttpPost, Route("AddNewCoachLesson"), Authorize("Bearer")]
-        public async Task<IActionResult> AddNewCoachLesson(CoachLessonDTO coachLessonDTO)
+        [HttpPost, Route("Create"), Authorize("Bearer")]
+        public async Task<IActionResult> AddNewCoachLesson([Required, FromBody] CoachLessonCreateDTO model)
         {
-            if (coachLessonDTO == null)
+            if (!ModelState.IsValid)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                return StatusCode((int)HttpStatusCode.BadRequest, ModelState);
             }
 
-            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart, coachLessonDTO.DateEnd))
+            if (!_coachLessonService.IsTimeAvailable(model.CoachId, model.DateStart.Value, model.DateEnd.Value))
             {
                 return StatusCode((int)HttpStatusCode.Conflict);
             }
 
-            TimeSpan span = coachLessonDTO.DateEnd.Subtract(coachLessonDTO.DateStart);
-            if (((int)span.TotalMinutes) == coachLessonDTO.Time)
+            TimeSpan span = model.DateEnd.Value.Subtract(model.DateStart.Value);
+            if (((int)span.TotalMinutes) == model.Time)
             {
                 return StatusCode((int)HttpStatusCode.BadRequest);
             }
 
             try
             {
-                await _lessonSubjectService.GetAsync(coachLessonDTO.LessonSubjectId);
+                await _lessonSubjectService.GetAsync(model.LessonSubjectId);
             }
             catch (IdDoesNotExistException)
             {
                 return StatusCode((int)HttpStatusCode.BadRequest);
             }
 
-            foreach (var item in coachLessonDTO.LessonLevels)
+            foreach (var levelId in model.LessonLevels)
             {
-                if (!_lessonLevelRepository.Query().Any(x => x.Id == item.Id))
+                if (!_lessonLevelRepository.Query().Any(x => x.Id == levelId))
                 {
                     return StatusCode((int)HttpStatusCode.BadRequest);
                 } 
             }
 
-            await _coachLessonService.AddNewCoachLesson(coachLessonDTO);
+            await _coachLessonService.AddNewCoachLesson(model);
 
             return StatusCode((int)HttpStatusCode.Created);
         }
