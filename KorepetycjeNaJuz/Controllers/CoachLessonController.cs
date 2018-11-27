@@ -78,7 +78,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="400">Błedne parametry</response>
         /// <response code="409">Czas jest już zajęty</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
-        [HttpPost, Route("Create"), AllowAnonymous /*Authorize("Bearer")*/]
+        [HttpPost, Route("Create"), Authorize("Bearer")]
         public async Task<IActionResult> CreateCoachLesson([Required, FromBody] CoachLessonCreateDTO coachLessonDTO)
         {
             if (!ModelState.IsValid)
