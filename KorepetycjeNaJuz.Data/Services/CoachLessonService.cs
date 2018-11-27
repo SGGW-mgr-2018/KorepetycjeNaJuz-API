@@ -136,14 +136,22 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
         public bool IsTimeAvailable(int coachID, DateTime startDate, DateTime endDate)
         {
-            return !_coachLessonRepository.Query().Where(c => c.CoachId == coachID).Any(x => ((x.DateStart >= startDate && x.DateStart <= endDate) || (x.DateEnd >= startDate && x.DateEnd <= endDate)));
+            return !_coachLessonRepository.Query()
+                .Where(c => c.CoachId == coachID)
+                .Any(x => ((x.DateStart >= startDate && x.DateStart <= endDate) || (x.DateEnd >= startDate && x.DateEnd <= endDate)));
         }
 
-        public async Task AddNewCoachLesson(CoachLessonDTO coachLessonDTO)
+        public async Task AddCoachLesson(AddCoachLessonDTO coachLessonDTO)
         {
             Address address = _mapper.Map<Address>(coachLessonDTO.Address);
             address.CoachId = coachLessonDTO.CoachId;
-            await _addressRepository.AddAsync(address);
+            Address dbAddress = _addressRepository.Query()
+                .Where(add => add.CoachId == coachLessonDTO.CoachId)
+                .Where(add => add.Latitude == address.Latitude && add.Longitude == address.Longitude && add.City == address.City && add.Street == address.Street).FirstOrDefault();
+
+            address = dbAddress == null 
+                ? await _addressRepository.AddAsync(address) 
+                : address = dbAddress;
 
             List<CoachLesson> coachLessonList = new List<CoachLesson>();
 

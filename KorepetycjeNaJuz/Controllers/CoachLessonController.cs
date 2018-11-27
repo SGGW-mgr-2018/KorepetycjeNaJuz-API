@@ -70,7 +70,7 @@ namespace KorepetycjeNaJuz.Controllers
         }
 
         /// <summary>
-        /// Metoda wyszukująca lekcje po zadanych filtrach.
+        /// Dodaje nowe ogłoszenie lekcji (coachLesson)
         /// </summary>
         /// <param name="coachLessonDTO">Dane lekcji</param>
         /// <returns></returns>
@@ -78,8 +78,8 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="400">Błedne parametry</response>
         /// <response code="409">Czas jest już zajęty</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
-        [HttpPost, Route("AddNewCoachLesson"), Authorize("Bearer")]
-        public async Task<IActionResult> AddNewCoachLesson(CoachLessonDTO coachLessonDTO)
+        [HttpPost, Route("AddCoachLesson"), Authorize("Bearer")]
+        public async Task<IActionResult> AddCoachLesson(AddCoachLessonDTO coachLessonDTO)
         {
             if (coachLessonDTO == null)
             {
@@ -114,7 +114,7 @@ namespace KorepetycjeNaJuz.Controllers
                 } 
             }
 
-            await _coachLessonService.AddNewCoachLesson(coachLessonDTO);
+            await _coachLessonService.AddCoachLesson(coachLessonDTO);
 
             return StatusCode((int)HttpStatusCode.Created);
         }
