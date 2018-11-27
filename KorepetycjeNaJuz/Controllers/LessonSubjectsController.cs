@@ -6,6 +6,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using NLog;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KorepetycjeNaJuz.Controllers
 {
