@@ -83,7 +83,7 @@ namespace KorepetycjeNaJuz.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest, ModelState);
+                return BadRequest(ModelState);
             }
 
             if (!_coachLessonService.IsTimeAvailable(model.CoachId, model.DateStart.Value, model.DateEnd.Value))
@@ -94,7 +94,8 @@ namespace KorepetycjeNaJuz.Controllers
             TimeSpan span = model.DateEnd.Value.Subtract(model.DateStart.Value);
             if (((int)span.TotalMinutes) == model.Time)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                ModelState.AddModelError("Time", "Zbyt długi czas lekcji, aby utworzyć lekcję w zadanym przedziale czasowym");
+                return BadRequest(ModelState);
             }
 
             try
@@ -103,14 +104,16 @@ namespace KorepetycjeNaJuz.Controllers
             }
             catch (IdDoesNotExistException)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                ModelState.AddModelError("LessonSubjectId", "Podany przedmiot lekcji nie istnieje.");
+                return BadRequest(ModelState);
             }
 
             foreach (var levelId in model.LessonLevels)
             {
                 if (!_lessonLevelRepository.Query().Any(x => x.Id == levelId))
                 {
-                    return StatusCode((int)HttpStatusCode.BadRequest);
+                    ModelState.AddModelError("LessonLevels", "Przynajmniej jeden poziom nie istnieje.");
+                    return BadRequest(ModelState);
                 } 
             }
 
