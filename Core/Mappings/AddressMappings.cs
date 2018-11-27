@@ -10,6 +10,7 @@ namespace KorepetycjeNaJuz.Core.Mappings
         public AddressMappings()
         {
             CreateMap<Address, AddressDTO>();
+            CreateMap<AddressDTO, Address>().ReverseMap();
         }
     }
 }
