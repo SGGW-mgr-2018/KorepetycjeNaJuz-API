@@ -155,10 +155,10 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
             List<CoachLesson> coachLessonList = new List<CoachLesson>();
 
-            DateTime currentDate = coachLessonDTO.DateStart;
-            ICollection<CoachLessonLevelDTO> levels = coachLessonDTO.LessonLevels;
+            DateTime currentDate = coachLessonDTO.DateStart.Value;
+            ICollection<int> levels = coachLessonDTO.LessonLevels;
 
-            while (currentDate.AddMinutes(coachLessonDTO.Time).Subtract(coachLessonDTO.DateEnd).TotalMinutes <= 0)
+            while (currentDate.AddMinutes(coachLessonDTO.Time).Subtract(coachLessonDTO.DateEnd.Value).TotalMinutes <= 0)
             {
                 CoachLesson coachLesson = _mapper.Map<CoachLesson>(coachLessonDTO);
                 coachLesson.DateStart = currentDate;
@@ -175,7 +175,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 ICollection<CoachLessonLevel> mappedLevels = new List<CoachLessonLevel>();
                 foreach (var level in levels)
                 {
-                    CoachLessonLevel a = new CoachLessonLevel { CoachLessonId = item.Id, LessonLevelId = level.Id };
+                    CoachLessonLevel a = new CoachLessonLevel { CoachLessonId = item.Id, LessonLevelId = level };
                     mappedLevels.Add(a);
                 }
                 item.LessonLevels = mappedLevels;

@@ -10,18 +10,14 @@ namespace KorepetycjeNaJuz.Core.Mappings
         public CoachLessonMappings()
         {
             CreateMap<CoachLesson, CoachLessonDTO>()
-                .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name));
+                .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name))
+                .ForMember(x => x.Time, opts => opts.MapFrom(i => i.DateEnd.Subtract(i.DateStart).TotalMinutes));
 
             CreateMap<CoachLessonLevel, CoachLessonLevelDTO>()
                 .ForMember(x => x.Id, opts => opts.MapFrom(i => i.LessonLevel.Id))
                 .ForMember(x => x.Name, opts => opts.MapFrom(i => i.LessonLevel.LevelName));
 
-            CreateMap<CoachLessonLevelDTO, CoachLessonLevel>().ReverseMap();
-
-            CreateMap<AddCoachLessonDTO, CoachLesson>()
-                .ForMember(x => x.RatePerHour, opts => opts.MapFrom(i => i.RatePerHour))
-                .ForMember(x => x.CoachId, opts => opts.MapFrom(i => i.CoachId))
-                .ForMember(x => x.LessonSubjectId, opts => opts.MapFrom(i => i.LessonSubjectId))
+            CreateMap<CoachLessonCreateDTO, CoachLesson>()
                 .ForMember(x => x.LessonLevels, opts => opts.Ignore());
         }
     }

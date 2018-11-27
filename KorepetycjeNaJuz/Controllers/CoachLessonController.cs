@@ -72,45 +72,48 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Dodaje nowe ogłoszenie lekcji (coachLesson)
         /// </summary>
-        /// <param name="coachLessonDTO">Dane lekcji</param>
+        /// <param name="model">Dane lekcji</param>
         /// <returns></returns>
         /// <response code="201">Stworzono CoachLesson</response>
         /// <response code="400">Błedne parametry</response>
         /// <response code="409">Czas jest już zajęty</response>
         [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
-        [HttpPost, Route("AddCoachLesson"), Authorize("Bearer")]
-        public async Task<IActionResult> AddCoachLesson(AddCoachLessonDTO coachLessonDTO)
+        [HttpPost, Route("Create"), Authorize("Bearer")]
+        public async Task<IActionResult> AddCoachLesson([Required, FromBody] CoachLessonCreateDTO coachLessonDTO)
         {
-            if (coachLessonDTO == null)
+            if (!ModelState.IsValid)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                return BadRequest(ModelState);
             }
 
-            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart, coachLessonDTO.DateEnd))
+            if (!_coachLessonService.IsTimeAvailable(model.CoachId, model.DateStart.Value, model.DateEnd.Value))
             {
                 return StatusCode((int)HttpStatusCode.Conflict);
             }
 
-            TimeSpan span = coachLessonDTO.DateEnd.Subtract(coachLessonDTO.DateStart);
-            if (((int)span.TotalMinutes) == coachLessonDTO.Time)
+            TimeSpan span = model.DateEnd.Value.Subtract(model.DateStart.Value);
+            if (((int)span.TotalMinutes) == model.Time)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                ModelState.AddModelError("Time", "Zbyt długi czas lekcji, aby utworzyć lekcję w zadanym przedziale czasowym");
+                return BadRequest(ModelState);
             }
 
             try
             {
-                await _lessonSubjectService.GetAsync(coachLessonDTO.LessonSubjectId);
+                await _lessonSubjectService.GetAsync(model.LessonSubjectId);
             }
             catch (IdDoesNotExistException)
             {
-                return StatusCode((int)HttpStatusCode.BadRequest);
+                ModelState.AddModelError("LessonSubjectId", "Podany przedmiot lekcji nie istnieje.");
+                return BadRequest(ModelState);
             }
 
-            foreach (var item in coachLessonDTO.LessonLevels)
+            foreach (var levelId in model.LessonLevels)
             {
-                if (!_lessonLevelRepository.Query().Any(x => x.Id == item.Id))
+                if (!_lessonLevelRepository.Query().Any(x => x.Id == levelId))
                 {
-                    return StatusCode((int)HttpStatusCode.BadRequest);
+                    ModelState.AddModelError("LessonLevels", "Przynajmniej jeden poziom nie istnieje.");
+                    return BadRequest(ModelState);
                 } 
             }
 
