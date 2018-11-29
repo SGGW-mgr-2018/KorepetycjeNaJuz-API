@@ -57,15 +57,21 @@ namespace KorepetycjeNaJuz
         {
             services.AddScoped<IOAuthService, OAuthService>();
             services.AddScoped<ILessonService, LessonService>();
+            services.AddScoped<ILessonSubjectService, LessonSubjectService>();
             services.AddScoped<ICoachLessonService, CoachLessonService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IMessageService, MessageService>();
         }
 
         private void RegisterRepositories(IServiceCollection services)
         {
             services.AddScoped<ILessonRepository, LessonRepository>();
+            services.AddScoped<ILessonSubjectRepository, LessonSubjectRepository>();
             services.AddScoped<ICoachLessonRepository, CoachLessonRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IAddressRepository, AddressRepository>();
+            services.AddScoped<ILessonLevelRepository, LessonLevelRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

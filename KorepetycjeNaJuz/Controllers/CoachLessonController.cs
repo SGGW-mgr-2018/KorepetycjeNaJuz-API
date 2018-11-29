@@ -1,17 +1,15 @@
 ﻿using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Interfaces;
-using KorepetycjeNaJuz.Core.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System;
 using NLog;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using KorepetycjeNaJuz.Core.Models;
-using System.Linq;
-using KorepetycjeNaJuz.Core.Enums;
+using KorepetycjeNaJuz.Core.Exceptions;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -21,17 +19,20 @@ namespace KorepetycjeNaJuz.Controllers
     {
         private readonly ILessonService _lessonService;
         private readonly ICoachLessonService _coachLessonService;
-        private readonly ICoachLessonRepository _coachLessonRepository;
+        private readonly ILessonSubjectService _lessonSubjectService;
+        private readonly ILessonLevelRepository _lessonLevelRepository;
         private readonly ILogger _logger;
 
         public CoachLessonController(
-            ILessonService lessonService, 
+            ILessonService lessonService,
             ICoachLessonService coachLessonService,
-            ICoachLessonRepository coachLessonRepository)
+            ILessonSubjectService lessonSubjectService,
+            ILessonLevelRepository lessonLevelRepository)
         {
             this._lessonService = lessonService;
             this._coachLessonService = coachLessonService;
-            this._coachLessonRepository = coachLessonRepository;
+            this._lessonSubjectService = lessonSubjectService;
+            this._lessonLevelRepository = lessonLevelRepository;
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
@@ -39,80 +40,86 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Metoda wyszukująca lekcje po zadanych filtrach.
         /// </summary>
-        /// <param name="getCoachLessonsByFiltersDTO">Dane lekcji</param>
-        /// <returns>Wygenerowany token JWT</returns>
+        /// <param name="filters">Dane lekcji</param>
+        /// <returns></returns>
         /// <response code="200">Lista dostępnych lekcji</response>
+        /// <response code="400">Błedne parametry</response>
         /// <response code="404">Nie znaleziono lekcji o podanych kryteriach</response>
-        [HttpPost,Route("GetCoachLessonsByFilters"), AllowAnonymous]
-        public IActionResult GetCoachLessonsByFilters([Required] GetCoachLessonsByFiltersDTO getCoachLessonsByFiltersDTO)
+        /// <response code="500">Błąd wewnętrzny</response>
+        [ProducesResponseType(typeof(IEnumerable<CoachLessonDTO>), 200)]
+        [ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(500)]
+        [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]
+        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO filters)
         {
-            List<CoachLesson> output;
-
-
-            if (getCoachLessonsByFiltersDTO.DateFrom == null)
-                getCoachLessonsByFiltersDTO.DateFrom = DateTime.Now;
-
-            if (getCoachLessonsByFiltersDTO.DateTo == null)
-                getCoachLessonsByFiltersDTO.DateTo = getCoachLessonsByFiltersDTO.DateFrom.AddDays(1);
-
-            IEnumerable<CoachLesson> query = _coachLessonRepository.ListAll().Where(
-                x => x.LessonStatus.Id == (int)LessonStatuses.WaitingForStudents ||
-                x.LessonStatus.Id == (int)LessonStatuses.Reserved &&
-                x.DateStart >= getCoachLessonsByFiltersDTO.DateFrom &&
-                x.DateEnd <= getCoachLessonsByFiltersDTO.DateTo);
-
-
-            // po tytule
-            if (getCoachLessonsByFiltersDTO.Subject != null)
-                query.Where(x=> x.Subject.Name == getCoachLessonsByFiltersDTO.Subject );
-
-            // po poziomie
-            if (getCoachLessonsByFiltersDTO.Level != null)
-                query.Where(x => x.LessonLevels.Any(i => i.LessonLevel.LevelName == getCoachLessonsByFiltersDTO.Level));
-
-            // po coachID
-            if (getCoachLessonsByFiltersDTO.CoachId != null)
-                query.Where(x => x.CoachId == getCoachLessonsByFiltersDTO.CoachId);
-
-            if (getCoachLessonsByFiltersDTO.Latitiude == null || getCoachLessonsByFiltersDTO.Longitiude == null || getCoachLessonsByFiltersDTO.Radius == null)
+            if (!ModelState.IsValid)
             {
-                // dodajemy wszystkie
-                output = query.ToList<CoachLesson>();
+                return BadRequest();
             }
-            else
+
+            try
             {
-                output = new List<CoachLesson>();
-                foreach (CoachLesson coachLesson in query)
+                var output = _coachLessonService.GetCoachLessonsByFilters(filters);
+
+                return output.Any() ? StatusCode(200, output) : NotFound("Lessons not found.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during GetCoachLessonsByFilters");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Dodaje nowe ogłoszenie lekcji (coachLesson)
+        /// </summary>
+        /// <param name="coachLessonDTO">Dane lekcji</param>
+        /// <returns></returns>
+        /// <response code="201">Stworzono CoachLesson</response>
+        /// <response code="400">Błedne parametry</response>
+        /// <response code="409">Czas jest już zajęty</response>
+        [ProducesResponseType(201), ProducesResponseType(400), ProducesResponseType(409)]
+        [HttpPost, Route("Create"), AllowAnonymous /*Authorize("Bearer")*/]
+        public async Task<IActionResult> CreateCoachLesson([Required, FromBody] CoachLessonCreateDTO coachLessonDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart.Value, coachLessonDTO.DateEnd.Value))
+            {
+                return StatusCode((int)HttpStatusCode.Conflict);
+            }
+
+            TimeSpan span = coachLessonDTO.DateEnd.Value.Subtract(coachLessonDTO.DateStart.Value);
+            if ((span.TotalMinutes % coachLessonDTO.Time != 0))
+            {
+                ModelState.AddModelError("Time", "Nie da się poprawnie rozłożyć lekcji w danym przedziale czasowym.");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                await _lessonSubjectService.GetAsync(coachLessonDTO.LessonSubjectId);
+            }
+            catch (IdDoesNotExistException)
+            {
+                ModelState.AddModelError("LessonSubjectId", "Podany przedmiot lekcji nie istnieje.");
+                return BadRequest(ModelState);
+            }
+
+            foreach (var levelId in coachLessonDTO.LessonLevels)
+            {
+                if (!_lessonLevelRepository.Query().Any(x => x.Id == levelId))
                 {
-                    // po odległości
-                    if (distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, getCoachLessonsByFiltersDTO.Latitiude.GetValueOrDefault(), getCoachLessonsByFiltersDTO.Longitiude.GetValueOrDefault()) <= getCoachLessonsByFiltersDTO.Radius)
-                    {
-                        output.Add(coachLesson);
-                    }
-                }
+                    ModelState.AddModelError("LessonLevels", "Przynajmniej jeden poziom nie istnieje.");
+                    return BadRequest(ModelState);
+                } 
             }
 
-            
+            await _coachLessonService.CreateCoachLesson(coachLessonDTO);
 
-            return output.Count < 1 ? StatusCode(404, "Lessons not found.") : StatusCode(200, output);
-        }
-        double distance(double lat1, double lon1, double lat2, double lon2)
-        {
-            double theta = lon1 - lon2;
-            double dist = Math.Sin(deg2rad(lat1)) * Math.Sin(deg2rad(lat2)) + Math.Cos(deg2rad(lat1)) * Math.Cos(deg2rad(lat2)) * Math.Cos(deg2rad(theta));
-            dist = Math.Acos(dist);
-            dist = rad2deg(dist);
-            dist = dist * 60 * 1.1515;
-            dist = dist * 1.609344; // to kilomiters
-            return (dist);
-        }
-        double deg2rad(double deg)
-        {
-            return (deg * Math.PI / 180.0);
-        }
-        double rad2deg(double rad)
-        {
-            return (rad / Math.PI * 180.0);
+            return StatusCode((int)HttpStatusCode.Created);
         }
 
     }

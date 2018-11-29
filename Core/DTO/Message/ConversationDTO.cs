@@ -1,5 +1,4 @@
-﻿using KorepetycjeNaJuz.Core.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
@@ -13,7 +12,7 @@ namespace KorepetycjeNaJuz.Core.DTO.Message
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
 
-        public static ConversationDTO Create(IGrouping<int, Models.Message> conversation, Dictionary<int, User> users)
+        public static ConversationDTO Create(IGrouping<int, Models.Message> conversation, Dictionary<int, Models.User> users)
         {
             return new ConversationDTO
             {
