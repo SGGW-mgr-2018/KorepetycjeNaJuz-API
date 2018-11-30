@@ -7,12 +7,12 @@ namespace KorepetycjeNaJuz.Core.DTO
         /// <summary>
         /// Szerokość geograficzna 
         /// </summary>
-        public double? Latitiude { get; set; }
+        public double? Latitude { get; set; }
 
         /// <summary>
         /// Długość geograficzna
         /// </summary>
-        public double? Longitiude { get; set; }
+        public double? Longitude { get; set; }
 
         /// <summary>
         /// Promień okręgu wyszukiwania (w kilometrach)
