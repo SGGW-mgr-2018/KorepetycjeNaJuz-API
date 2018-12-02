@@ -3,6 +3,8 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Repositories
@@ -13,6 +15,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             : base(dbContext)
         {
   
+        }
+
+        public List<Lesson> GetLessonsForCoachLesson(int coachLessonId)
+        {
+            return _dbContext.Lessons.Where(p => p.CoachLessonId == coachLessonId).ToList();
         }
     }
 }

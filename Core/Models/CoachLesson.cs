@@ -31,7 +31,5 @@ namespace KorepetycjeNaJuz.Core.Models
 
         public int AddressId { get; set; }
         public virtual Address Address { get; set; }
-
-        public virtual ICollection<Lesson> Lessons { get; set; }
     }
 }
