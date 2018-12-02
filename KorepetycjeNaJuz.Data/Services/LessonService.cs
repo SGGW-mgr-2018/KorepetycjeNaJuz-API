@@ -41,36 +41,36 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         {
             return _lessonRepository.GetById(lessonId) != null;
         }
+
         public void RejectLesson(int id)
         {
             var lesson = _lessonRepository.GetById(id);
 
-            lesson.LessonStatus.Id = (int)LessonStatuses.Rejected;
+            lesson.LessonStatusId = (int)LessonStatuses.Rejected;
             _lessonRepository.UpdateAsync(lesson);
         }
+
         public Lesson GetById(int id)
         {
             return _lessonRepository.GetById(id);
         }
+
         public void ApproveLesson(LessonAcceptDTO lessonAcceptDTO)
         {
-            var selectedLesson = _lessonRepository.GetById(lessonAcceptDTO.LessonId);
             var coachLesson = _coachLessonRepository.GetById(lessonAcceptDTO.CoachLessonId);
-            var allLessonsForCoachLesson = _lessonRepository.GetLessonsForCoachLesson(lessonAcceptDTO.CoachLessonId);
+            var allLessonsForCoachLesson = coachLesson.Lessons;
 
             foreach (var lesson in allLessonsForCoachLesson)
             {
                 if (lesson.Id == lessonAcceptDTO.LessonId)
-                    selectedLesson.LessonStatus.Id = (int)LessonStatuses.Approved;
+                    lesson.LessonStatusId = (int)LessonStatuses.Approved;
                 else
                     lesson.LessonStatusId = (int)LessonStatuses.Rejected;
                 _lessonRepository.UpdateAsync(lesson);
             }
 
-            coachLesson.LessonStatus.Id = (int)LessonStatuses.Approved;
+            coachLesson.LessonStatusId = (int)LessonStatuses.Approved;
             _coachLessonRepository.UpdateAsync(coachLesson);
-            _lessonRepository.UpdateAsync(selectedLesson);
-
         }
     }
 }

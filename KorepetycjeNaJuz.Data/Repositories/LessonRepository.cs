@@ -16,10 +16,5 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
         {
   
         }
-
-        public List<Lesson> GetLessonsForCoachLesson(int coachLessonId)
-        {
-            return _dbContext.Lessons.Where(p => p.CoachLessonId == coachLessonId).ToList();
-        }
     }
 }
