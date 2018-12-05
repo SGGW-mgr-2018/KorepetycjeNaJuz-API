@@ -3,6 +3,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
@@ -28,8 +29,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var lesson = _mapper.Map<Lesson>(lessonCreateDTO);
             var coachLesson = await _coachLessonRepository.GetByIdAsync(lessonCreateDTO.CoachLessonId);
 
-            lesson.Date = coachLesson.DateEnd;
-            lesson.NumberOfHours = (coachLesson.DateEnd - coachLesson.DateStart).Hours;
+            lesson.Date = coachLesson.DateStart;
+            lesson.NumberOfHours = (float)(coachLesson.DateEnd - coachLesson.DateStart).TotalHours;
             lesson.LessonStatusId = (int)LessonStatuses.Reserved;
             await _lessonRepository.AddAsync(lesson);
 
@@ -62,6 +63,13 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             lesson.CoachLesson.LessonStatusId = (int)LessonStatuses.Approved;
 
             _lessonRepository.Update(lesson);
+        }
+
+        public IEnumerable<LessonDTO> GetLessonsForCoachLesson(int coachLessonId)
+        {
+            var coachLesson = _coachLessonRepository.GetById(coachLessonId);
+
+            return _mapper.Map<IEnumerable<LessonDTO>>(coachLesson.Lessons);
         }
     }
 }

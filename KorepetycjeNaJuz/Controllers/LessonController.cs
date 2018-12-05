@@ -137,8 +137,6 @@ namespace KorepetycjeNaJuz.Controllers
                 return BadRequest(ModelState);
             if (!_lessonService.IsLessonExists(id))
                 return NotFound();
-            //if (!_coachLessonService.IsCoachLessonExists(lessonAcceptDTO.CoachLessonId))
-            //    return NotFound();
 
             if (_lessonService.GetById(id).LessonStatusId == (int)LessonStatuses.Approved)
             {
@@ -164,5 +162,42 @@ namespace KorepetycjeNaJuz.Controllers
             return StatusCode((int)HttpStatusCode.OK);
         }
 
+        /// <summary>
+        /// Pobiera lekcje dla danego ogłoszenia (coachLesson)
+        /// </summary>
+        /// <param name="coachLessonId">Id danego ogłoszenia</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie pobrano lekcje dla ogłoszenia</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="403">Nie masz uprawnień, aby pobrać lekcje dla podanego ogłoszenia</response>
+        /// <response code="404">Podane ogłoszenie nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400)]
+        [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
+        [HttpPost, Route("GetForCoachLesson/{coachLessonId}"), Authorize("Bearer")]
+        public IActionResult GetLessonForCoachLesson([Required] int coachLessonId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_coachLessonService.IsCoachLessonExists(coachLessonId))
+                return NotFound();
+
+            var currentUserId = User.GetUserId().Value;
+            if (!_coachLessonService.IsUserOwnerOfCoachLesson(coachLessonId, currentUserId))
+                return Forbid();
+
+            try
+            {
+                var lessons = _lessonService.GetLessonsForCoachLesson(coachLessonId);
+
+                return Ok(lessons);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during LessonStatus change");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
