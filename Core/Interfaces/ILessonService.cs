@@ -8,8 +8,8 @@ namespace KorepetycjeNaJuz.Core.Interfaces
     {
         Task CreateLessonAsync(LessonCreateDTO lessonCreateDTO);
         bool IsLessonExists(int lessonId);
-        Lesson GetById(int id);
-        void RejectLesson(int id);
-        void ApproveLesson(LessonAcceptDTO lessonAcceptDTO);
+        Lesson GetById(int lessonId);
+        void RejectLesson(int lessonId);
+        void ApproveLesson(int lessonId);
     }
 }

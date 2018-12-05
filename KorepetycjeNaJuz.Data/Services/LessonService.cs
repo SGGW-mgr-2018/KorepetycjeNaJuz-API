@@ -55,22 +55,13 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return _lessonRepository.GetById(id);
         }
 
-        public void ApproveLesson(LessonAcceptDTO lessonAcceptDTO)
+        public void ApproveLesson(int id)
         {
-            var coachLesson = _coachLessonRepository.GetById(lessonAcceptDTO.CoachLessonId);
-            var allLessonsForCoachLesson = coachLesson.Lessons;
+            var lesson = _lessonRepository.GetById(id);
+            lesson.LessonStatusId = (int)LessonStatuses.Approved;
+            lesson.CoachLesson.LessonStatusId = (int)LessonStatuses.Approved;
 
-            foreach (var lesson in allLessonsForCoachLesson)
-            {
-                if (lesson.Id == lessonAcceptDTO.LessonId)
-                    lesson.LessonStatusId = (int)LessonStatuses.Approved;
-                else
-                    lesson.LessonStatusId = (int)LessonStatuses.Rejected;
-                _lessonRepository.UpdateAsync(lesson);
-            }
-
-            coachLesson.LessonStatusId = (int)LessonStatuses.Approved;
-            _coachLessonRepository.UpdateAsync(coachLesson);
+            _lessonRepository.Update(lesson);
         }
     }
 }

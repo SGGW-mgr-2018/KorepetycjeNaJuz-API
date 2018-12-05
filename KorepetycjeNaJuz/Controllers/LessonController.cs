@@ -123,7 +123,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Ustawia status danej rezerwacji na "zatwierdzony" (approved), pozostałe odrzuca.
         /// </summary>
-        /// <param name="lessonAcceptDTO">Zawiera ID zajęć oraz ID rezerwacji.</param>
+        /// <param name="id">ID lekcji</param>
         /// <returns></returns>
         /// <response code="200">Poprawnie zatwierdzono rezerwację</response>
         /// <response code="400">Niepoprawne dane</response>
@@ -131,21 +131,21 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="404">Podana rezerwacja nie istnieje</response>
         [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
         [HttpPost, Route("Approve"), Authorize("Bearer")]
-        public IActionResult ApproveLesson([Required] LessonAcceptDTO lessonAcceptDTO)
+        public IActionResult ApproveLesson([Required] int id)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            if (!_lessonService.IsLessonExists(lessonAcceptDTO.LessonId))
+            if (!_lessonService.IsLessonExists(id))
                 return NotFound();
-            if (!_coachLessonService.IsCoachLessonExists(lessonAcceptDTO.CoachLessonId))
-                return NotFound();
+            //if (!_coachLessonService.IsCoachLessonExists(lessonAcceptDTO.CoachLessonId))
+            //    return NotFound();
 
-            if (_lessonService.GetById(lessonAcceptDTO.LessonId).LessonStatus.Id == (int)LessonStatuses.Approved)
+            if (_lessonService.GetById(id).LessonStatusId == (int)LessonStatuses.Approved)
             {
                 ModelState.AddModelError("LessonStatus", "Rezerwacja została już zatwierdzona.");
                 return BadRequest(ModelState);
             }
-            if (_coachLessonService.GetById(lessonAcceptDTO.CoachLessonId).LessonStatus.Id == (int)LessonStatuses.Approved)
+            if (_lessonService.GetById(id).CoachLesson.LessonStatusId == (int)LessonStatuses.Approved)
             {
                 ModelState.AddModelError("LessonStatus", "Zajęcia mają już zatwierdzoną rezerwację.");
                 return BadRequest(ModelState);
@@ -153,7 +153,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.ApproveLesson(lessonAcceptDTO);
+                _lessonService.ApproveLesson(id);
             }
             catch (Exception ex)
             {
