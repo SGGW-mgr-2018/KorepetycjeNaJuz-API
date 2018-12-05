@@ -8,6 +8,7 @@ using System;
 using NLog;
 using System.Net;
 using System.Threading.Tasks;
+using KorepetycjeNaJuz.Core.Enums;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -81,6 +82,122 @@ namespace KorepetycjeNaJuz.Controllers
 
             return StatusCode((int)HttpStatusCode.Created);
         }
+        /// <summary>
+        /// Ustawia status danej rezerwacji na "odrzucony" (rejected).
+        /// </summary>
+        /// <param name="id">ID lekcji</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie odrzucono rezerwację</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana rezerwacja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
+        [HttpPost, Route("Reject"), Authorize("Bearer")]
+        public IActionResult RejectLesson([Required] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
+            if (!_lessonService.IsLessonExists(id))
+                return NotFound();
+
+            if (_lessonService.GetById(id).LessonStatus.Id == (int)LessonStatuses.Rejected)
+            {
+                ModelState.AddModelError("LessonStatus", "Rezerwacja została już odrzucona.");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                _lessonService.RejectLesson(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during LessonStatus change");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Ustawia status danej rezerwacji na "zatwierdzony" (approved), pozostałe odrzuca.
+        /// </summary>
+        /// <param name="id">ID lekcji</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie zatwierdzono rezerwację</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana rezerwacja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
+        [HttpPost, Route("Approve"), Authorize("Bearer")]
+        public IActionResult ApproveLesson([Required] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            if (!_lessonService.IsLessonExists(id))
+                return NotFound();
+
+            if (_lessonService.GetById(id).LessonStatusId == (int)LessonStatuses.Approved)
+            {
+                ModelState.AddModelError("LessonStatus", "Rezerwacja została już zatwierdzona.");
+                return BadRequest(ModelState);
+            }
+            if (_lessonService.GetById(id).CoachLesson.LessonStatusId == (int)LessonStatuses.Approved)
+            {
+                ModelState.AddModelError("LessonStatus", "Zajęcia mają już zatwierdzoną rezerwację.");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                _lessonService.ApproveLesson(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during LessonStatus change");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+
+            return StatusCode((int)HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Pobiera lekcje dla danego ogłoszenia (coachLesson)
+        /// </summary>
+        /// <param name="coachLessonId">Id danego ogłoszenia</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie pobrano lekcje dla ogłoszenia</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="403">Nie masz uprawnień, aby pobrać lekcje dla podanego ogłoszenia</response>
+        /// <response code="404">Podane ogłoszenie nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400)]
+        [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
+        [HttpPost, Route("GetForCoachLesson/{coachLessonId}"), Authorize("Bearer")]
+        public IActionResult GetLessonForCoachLesson([Required] int coachLessonId)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_coachLessonService.IsCoachLessonExists(coachLessonId))
+                return NotFound();
+
+            var currentUserId = User.GetUserId().Value;
+            if (!_coachLessonService.IsUserOwnerOfCoachLesson(coachLessonId, currentUserId))
+                return Forbid();
+
+            try
+            {
+                var lessons = _lessonService.GetLessonsForCoachLesson(coachLessonId);
+
+                return Ok(lessons);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during LessonStatus change");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

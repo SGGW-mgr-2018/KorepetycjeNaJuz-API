@@ -9,6 +9,8 @@ namespace KorepetycjeNaJuz.Core.Mappings
         public LessonMappings()
         {
             CreateMap<LessonCreateDTO, Lesson>().ReverseMap();
+
+            CreateMap<Lesson, LessonDTO>().ReverseMap();
         }
     }
 }

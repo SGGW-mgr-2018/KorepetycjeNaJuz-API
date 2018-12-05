@@ -44,7 +44,6 @@ namespace KorepetycjeNaJuz.Infrastructure
                 .HasOne(bc => bc.LessonLevel)
                 .WithMany(c => c.CoachLessons)
                 .HasForeignKey(bc => bc.LessonLevelId);
-
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

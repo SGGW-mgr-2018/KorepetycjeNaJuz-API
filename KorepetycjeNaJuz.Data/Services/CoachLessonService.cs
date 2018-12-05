@@ -182,5 +182,10 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 await _coachLessonRepository.AddAsync(item);
             }
         }
+
+        public CoachLesson GetById(int id)
+        {
+            return _coachLessonRepository.GetById(id);
+        }
     }
 }
