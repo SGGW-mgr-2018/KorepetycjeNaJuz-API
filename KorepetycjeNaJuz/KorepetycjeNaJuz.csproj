@@ -39,4 +39,8 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(SolutionDir)Core\KorepetycjeNaJuzCore.xml&quot; &quot;$(TargetDir)KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
+  </Target>
+
 </Project>

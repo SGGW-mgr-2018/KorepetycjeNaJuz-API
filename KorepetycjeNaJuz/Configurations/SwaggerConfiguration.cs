@@ -39,10 +39,12 @@ namespace KorepetycjeNaJuz.Configurations
                 c.DescribeAllEnumsAsStrings();
                 c.IgnoreObsoleteProperties();
                 c.IncludeXmlComments(CreateXmlCommentsPath());
+                c.IncludeXmlComments(GetXmlCommentsPathForCore());
 
                 // Operation Filters
                 c.OperationFilter<AddAuthorizationHeaderParameterOperationFilter>();
                 c.ParameterFilter<SwaggerParameterAttributeParameterFilter>();
+                
             });
         }
 
@@ -65,5 +67,15 @@ namespace KorepetycjeNaJuz.Configurations
             return xmlPath;
         }
 
+        private static string GetXmlCommentsPathForCore()
+        {
+            string coreProjectName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + "Core";
+            string xmlCommentsFileName = coreProjectName + XmlExtension;
+
+            string basePath = ApplicationEnvironment.ApplicationBasePath;
+            string xmlPath = Path.Combine(basePath, xmlCommentsFileName);
+
+            return xmlPath;
+        }
     }
 }
