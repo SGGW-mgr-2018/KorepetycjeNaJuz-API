@@ -30,7 +30,7 @@ namespace KorepetycjeNaJuz.Configurations
                     Name = ApiKeySchemeName,
                     In = ApiKeySchemeIn,
                     Type = ApiKeySchemeType
-                });
+                });                
                 c.AddSecurityRequirement(new Dictionary<string, IEnumerable<string>>
                 {
                     { "Bearer", new string[] { } }
@@ -42,6 +42,7 @@ namespace KorepetycjeNaJuz.Configurations
 
                 // Operation Filters
                 c.OperationFilter<AddAuthorizationHeaderParameterOperationFilter>();
+                c.ParameterFilter<SwaggerParameterAttributeParameterFilter>();
             });
         }
 
