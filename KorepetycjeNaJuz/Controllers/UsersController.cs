@@ -12,6 +12,7 @@ using KorepetycjeNaJuz.Infrastructure;
 using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Interfaces;
 using System.Net;
+using Microsoft.AspNetCore.Identity;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -20,13 +21,22 @@ namespace KorepetycjeNaJuz.Controllers
     public class UsersController : ControllerBase
     {
         private readonly KorepetycjeContext _context;
+
         private readonly IUserService _userService;
+        private readonly IOAuthService _oAuthService;
+        private readonly UserManager<User> _userManager;
         private readonly ILogger _logger;
     
-        public UsersController(IUserService userService, KorepetycjeContext context)
+        public UsersController(
+            IUserService userService,
+            IOAuthService oAuthService,
+            UserManager<User> userManager,
+            KorepetycjeContext context)
         {
             this._logger = LogManager.GetLogger("apiLogger");
             this._userService = userService;
+            this._oAuthService = oAuthService;
+            this._userManager = userManager;
             this._context = context;
         }
 
@@ -130,9 +140,9 @@ namespace KorepetycjeNaJuz.Controllers
         /// </summary>
         /// <param name="userCreateDTO">JSON zawierający wszystkie wymagane dane użytkownika</param>
         /// <returns>JSON ze wszystkimi danymi nowego użytkownika</returns>
-        /// <response code="201">Poprawnie utworzono użytkownika</response>
+        /// <response code="201">Poprawnie utworzono użytkownika - zwraca token JWT</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
-        [ProducesResponseType(201), ProducesResponseType(400)]
+        [ProducesResponseType(typeof(UserTokenDTO), 201), ProducesResponseType(400)]
         [HttpPost, Route("Create"), AllowAnonymous]
         public async Task<IActionResult> PostUser([FromBody] UserCreateDTO userCreateDTO)
         {
@@ -154,10 +164,15 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error("Error during user registration");
                 return BadRequest();
             }
-
             _logger.Info(string.Format("User {0} {1} has been added ", userCreateDTO.FirstName, userCreateDTO.LastName));
 
-            return StatusCode((int)HttpStatusCode.Created);
+            var user = await this._userManager.FindByNameAsync(userCreateDTO.Email);
+            var userToken = new UserTokenDTO
+            {
+                Token = this._oAuthService.GetUserAuthToken(userCreateDTO.Email, user.Id.ToString())
+            };
+
+            return StatusCode((int)HttpStatusCode.Created, userToken);
         }
 
         /// <summary>
