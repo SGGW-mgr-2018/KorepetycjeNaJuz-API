@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using KorepetycjeNaJuz.Core.Exceptions;
+using KorepetycjeNaJuz.Core.Attributes.SwaggerAttributes;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -40,7 +41,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Metoda wyszukująca lekcje po zadanych filtrach.
         /// </summary>
-        /// <param name="filters">Dane lekcji</param>
+        /// <param name="coachLessonsByFiltersDTO">Dane lekcji</param>        
         /// <returns></returns>
         /// <response code="200">Lista dostępnych lekcji</response>
         /// <response code="400">Błedne parametry</response>
@@ -48,8 +49,8 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="500">Błąd wewnętrzny</response>
         [ProducesResponseType(typeof(IEnumerable<CoachLessonDTO>), 200)]
         [ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(500)]
-        [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]
-        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO filters)
+        [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]        
+        public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO coachLessonsByFiltersDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -58,7 +59,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                var output = _coachLessonService.GetCoachLessonsByFilters(filters);
+                var output = _coachLessonService.GetCoachLessonsByFilters(coachLessonsByFiltersDTO);
 
                 return output.Any() ? StatusCode(200, output) : NotFound("Lessons not found.");
             }
