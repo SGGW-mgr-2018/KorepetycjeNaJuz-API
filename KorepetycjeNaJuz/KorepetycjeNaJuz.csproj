@@ -44,8 +44,11 @@
     <Exec Command="copy &quot;$(ProjectDir)..\Core\KorepetycjeNaJuzCore.xml&quot; &quot;$(TargetDir)KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
   </Target>
   
-  <Target Name="MyTarget" AfterTargets="AfterPublish">
-    <Exec Command="copy &quot;$(TargetDir)\KorepetycjeNaJuzCore.xml&quot; &quot;$(ProjectDir)..\..\wwwroot\KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish"> 
+	<ItemGroup> 
+		<DocFile Include="bin\**\**\KorepetycjeNaJuzCore.xml" /> 
+	</ItemGroup> 
+	<Copy SourceFiles="@(DocFile)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="false" /> 
   </Target>
 
 </Project>
