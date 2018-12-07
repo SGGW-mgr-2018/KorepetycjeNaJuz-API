@@ -24,18 +24,19 @@ namespace KorepetycjeNaJuz.Core.Models
         [MaxLength(2000)]
         public string Description { get; set; }
 
-        [MaxLength(1000)]
-        public byte[] Avatar { get; set; }
+        public string Avatar { get; set; }
 
         public bool RodoConfirmed { get; set; }
 
         public bool CookiesConfirmed { get; set; }
 
         public bool PrivacyPolicesConfirmed { get; set; }
+
         public override bool Equals(object obj)
         {
             return (obj is User user) && user.Id == Id;
         }
+
         public override int GetHashCode()
         {
             return Id;
