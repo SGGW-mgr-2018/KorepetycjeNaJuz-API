@@ -43,5 +43,9 @@
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="copy &quot;$(ProjectDir)..\Core\KorepetycjeNaJuzCore.xml&quot; &quot;$(TargetDir)KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
   </Target>
+  
+  <Target Name="MyTarget" AfterTargets="AfterPublish">
+    <Exec Command="copy &quot;$(TargetDir)\KorepetycjeNaJuzCore.xml&quot; &quot;$(TargetDir)\publish\KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
+  </Target>
 
 </Project>
