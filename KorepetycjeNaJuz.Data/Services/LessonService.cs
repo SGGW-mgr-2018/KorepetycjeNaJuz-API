@@ -71,5 +71,23 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
             return _mapper.Map<IEnumerable<LessonDTO>>(coachLesson.Lessons);
         }
+
+        public void RateLessonStudent(LessonRatingDTO lessonRatingDTO)
+        {
+            var lesson = _lessonRepository.GetById(lessonRatingDTO.LessonId);
+            lesson.RatingOfStudent = (byte) lessonRatingDTO.Rating;
+            lesson.OpinionOfStudent = lessonRatingDTO.Opinion;
+
+            _lessonRepository.Update(lesson);
+        }
+
+        public void RateLessonCoach(LessonRatingDTO lessonRatingDTO)
+        {
+            var lesson = _lessonRepository.GetById(lessonRatingDTO.LessonId);
+            lesson.RatingOfCoach = (byte)lessonRatingDTO.Rating;
+            lesson.OpinionOfCoach = lessonRatingDTO.Opinion;
+
+            _lessonRepository.Update(lesson);
+        }
     }
 }

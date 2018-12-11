@@ -9,6 +9,7 @@ using NLog;
 using System.Net;
 using System.Threading.Tasks;
 using KorepetycjeNaJuz.Core.Enums;
+using KorepetycjeNaJuz.Core.Models;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -198,6 +199,89 @@ namespace KorepetycjeNaJuz.Controllers
                 _logger.Error(ex, "Error during LessonStatus change");
                 return StatusCode((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        /// <summary>
+        /// Umieszcza ocenę i opcjonalny komentarz do lekcji, jeśli zalogowany jest student ocena wystawiana jest korepetyście, jeśli korepetysta - uczniowi
+        /// </summary>
+        /// <param name="lessonRatingDTO"></param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie dodano ocenę i komentarz do lekcji</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="403">Nie masz uprawnień, aby dodać ocenę</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
+        [HttpPost, Route("Rating/Post"), Authorize("Bearer")]
+        public IActionResult PostLessonRating([Required, FromBody] LessonRatingDTO lessonRatingDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_lessonService.IsLessonExists(lessonRatingDTO.LessonId))
+                return NotFound();
+
+
+            var currentUserId = User.GetUserId().Value;
+            Lesson lesson = _lessonService.GetById(lessonRatingDTO.LessonId);
+            if (lesson.StudentId == currentUserId)
+            {
+                _lessonService.RateLessonCoach(lessonRatingDTO);
+                return Ok();
+            }
+            else if (lesson.CoachLesson.CoachId == currentUserId)
+            {
+                _lessonService.RateLessonStudent(lessonRatingDTO);
+                return Ok();
+            }
+
+            return Forbid();
+        }
+
+        /// <summary>
+        /// Pobiera ocenę i komentarz o studencie dla danej lekcji
+        /// </summary>
+        /// <param name="id">Id lekcji</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie pobrano ocenę i komentarz</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(401), ProducesResponseType(404)]
+        [HttpPost, Route("Rating/Student/{id}"), Authorize("Bearer")]
+        public IActionResult GetLessonStudentRating([Required] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_lessonService.IsLessonExists(id))
+                return NotFound();
+
+            Lesson lesson = _lessonService.GetById(id);
+            return Ok(new LessonRatingDTO(lesson.Id, (int)lesson.RatingOfStudent, lesson.OpinionOfStudent));
+        }
+
+        /// <summary>
+        /// Pobiera ocenę i komentarz o korepetytorze dla danej lekcji
+        /// </summary>
+        /// <param name="id">Id lekcji</param>
+        /// <returns></returns>
+        /// <response code="200">Poprawnie pobrano ocenę i komentarz</response>
+        /// <response code="400">Niepoprawne dane</response>
+        /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="404">Podana lekcja nie istnieje</response>
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(401), ProducesResponseType(404)]
+        [HttpPost, Route("Rating/Coach/{id}"), Authorize("Bearer")]
+        public IActionResult GetLessonCoachRating([Required] int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_lessonService.IsLessonExists(id))
+                return NotFound();
+
+            Lesson lesson = _lessonService.GetById(id);
+            return Ok(new LessonRatingDTO(lesson.Id, (int)lesson.RatingOfCoach, lesson.OpinionOfCoach));
         }
     }
 }
