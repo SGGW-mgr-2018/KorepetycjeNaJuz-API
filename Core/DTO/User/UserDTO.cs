@@ -5,7 +5,7 @@
         /// <summary>
         /// Id użytkownika
         /// </summary>
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Imię użytkownika
@@ -33,8 +33,8 @@
         public string Description { get; set; }
 
         /// <summary>
-        /// Zdjęcie/avatar użytkownika
+        /// Zdjęcie/avatar użytkownika (base64 image)
         /// </summary>
-        public byte[] Avatar { get; set; }
+        public string Avatar { get; set; }
     }
 }
