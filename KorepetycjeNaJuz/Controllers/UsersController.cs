@@ -20,8 +20,6 @@ namespace KorepetycjeNaJuz.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly KorepetycjeContext _context;
-
         private readonly IUserService _userService;
         private readonly IOAuthService _oAuthService;
         private readonly UserManager<User> _userManager;
@@ -30,14 +28,12 @@ namespace KorepetycjeNaJuz.Controllers
         public UsersController(
             IUserService userService,
             IOAuthService oAuthService,
-            UserManager<User> userManager,
-            KorepetycjeContext context)
+            UserManager<User> userManager)
         {
             this._logger = LogManager.GetLogger("apiLogger");
             this._userService = userService;
             this._oAuthService = oAuthService;
             this._userManager = userManager;
-            this._context = context;
         }
 
         /// <summary>
@@ -83,56 +79,40 @@ namespace KorepetycjeNaJuz.Controllers
         /// <summary>
         /// Edycja użytkownika o wskazanym numerze ID
         /// </summary>
-        /// <param name="id">Numer ID wybranego użytkownika</param>
-        /// <param name="user">JSON zawierający wszystkie dane użytkownika</param>
+        /// <param name="userEditDTO">JSON zawierający wszystkie dane użytkownika</param>
         /// <returns>Kod odpowiedzi HTTP 204, 400 lub 404</returns>
-        /// <response code="204">Poprawnie edytowano użytkownika</response>
+        /// <response code="200">Poprawnie edytowano użytkownika</response>
+        /// <response code="304">Wystąpił błąd podczas edycji danych</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
         /// <response code="401">Wymagana autoryzacja</response>
         /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
-        [ProducesResponseType(204), ProducesResponseType(400)]
+        [ProducesResponseType(typeof(UserDTO), 200), ProducesResponseType(304), ProducesResponseType(400)]
         [ProducesResponseType(401), ProducesResponseType(404)]
-        [HttpPut, Route("Update/{id}"), Authorize("Bearer")]
-        public async Task<IActionResult> PutUser([FromRoute] int id, [FromBody] User user)
+        [HttpPut, Route("Update"), Authorize("Bearer")]
+        public async Task<IActionResult> PutUser([FromBody] UserEditDTO userEditDTO)
         {
-            _logger.Info(string.Format("Executing PutUser({0}) method...", id));
+            _logger.Info(string.Format("Executing PutUser({0}) method...", userEditDTO.Id));
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (id != user.Id)
-                return BadRequest();
-
-            bool isUserExists = await _userService.IsUserExistsAsync(id);
+            bool isUserExists = await _userService.IsUserExistsAsync(userEditDTO.Id);
             if (!isUserExists)
                 return NotFound();
 
-            PropertyValues _oldVals = _context.Entry(user).GetDatabaseValues();
-            string _oldEmail = _oldVals.GetValue<string>("Email");
-            string _oldPhoneNumber = _oldVals.GetValue<string>("PhoneNumber");
+            try
+            {
+                var updatedUser = await _userService.UpdateUserAsync(userEditDTO);
+                _logger.Info(string.Format("User with id={0} has been modified.", updatedUser.Id));
 
-            if (user.Email != _oldEmail)
-                user.EmailConfirmed = false;
-            else
-                user.EmailConfirmed = true;
-            if (user.PhoneNumber != _oldPhoneNumber)
-                user.PhoneNumberConfirmed = false;
-            else
-                user.PhoneNumberConfirmed = true;
-            
-            _context.Entry(user).State = EntityState.Modified;
-
-            try { await _context.SaveChangesAsync(); }
+                return Ok(updatedUser);
+            }
             catch (DbUpdateConcurrencyException e)
             {
                 UserControllerException uce = new UserControllerException(string.Format("Database update operation was impossible due to the following cause:\n", e.Message));
                 _logger.Error(uce.Message);
                 return StatusCode(304, uce.Message);
             }
-
-            _logger.Info(string.Format("User with id={0} has been modified.", id));
-
-            return NoContent();
         }
 
         /// <summary>
@@ -192,16 +172,22 @@ namespace KorepetycjeNaJuz.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var isUserExists = await _userService.IsUserExistsAsync(id);
+            if (!isUserExists)
                 return NotFound();
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _userService.DeleteUserAsync(id);
+                _logger.Info(string.Format("User with id={0} has been deleted.", id));
 
-            _logger.Info(string.Format("User with id={0} has been deleted.", id));
-
-            return Ok(user);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during User DELETE operation");
+                return StatusCode(500);
+            }
         }
 
         public class UserControllerException : ApplicationException
