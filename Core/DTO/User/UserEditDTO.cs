@@ -55,6 +55,6 @@ namespace KorepetycjeNaJuz.Core.DTO
         /// Akceptacja regulaminu serwisu
         /// </summary>
         [RequireValueIfExists("True", ErrorMessage = "Musisz zaakceptować regulamin serwisu.")]
-        public bool PrivacyPolicesConfirmed { get; set; }
+        public bool? PrivacyPolicesConfirmed { get; set; }
     }
 }
