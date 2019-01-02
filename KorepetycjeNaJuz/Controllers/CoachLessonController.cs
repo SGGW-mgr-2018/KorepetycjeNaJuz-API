@@ -11,6 +11,7 @@ using System.Net;
 using System.Threading.Tasks;
 using KorepetycjeNaJuz.Core.Exceptions;
 using KorepetycjeNaJuz.Core.Attributes.SwaggerAttributes;
+using KorepetycjeNaJuz.Core.Helpers;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -87,7 +88,8 @@ namespace KorepetycjeNaJuz.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!_coachLessonService.IsTimeAvailable(coachLessonDTO.CoachId, coachLessonDTO.DateStart.Value, coachLessonDTO.DateEnd.Value))
+            int currentUserID = this.User.GetUserId().Value;
+            if (!_coachLessonService.IsTimeAvailable(currentUserID, coachLessonDTO.DateStart.Value, coachLessonDTO.DateEnd.Value))
             {
                 return StatusCode((int)HttpStatusCode.Conflict);
             }
@@ -118,7 +120,7 @@ namespace KorepetycjeNaJuz.Controllers
                 } 
             }
 
-            await _coachLessonService.CreateCoachLesson(coachLessonDTO);
+            await _coachLessonService.CreateCoachLesson(coachLessonDTO, currentUserID);
 
             return StatusCode((int)HttpStatusCode.Created);
         }
