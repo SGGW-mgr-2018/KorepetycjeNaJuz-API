@@ -16,7 +16,7 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         IEnumerable<CoachLessonDTO> GetCoachLessonsByFilters(CoachLessonsByFiltersDTO filters);
 
         bool IsTimeAvailable(int coachID, DateTime startDate, DateTime endDate);
-        Task CreateCoachLesson(CoachLessonCreateDTO coachLessonDTO);
+        Task CreateCoachLesson(CoachLessonCreateDTO coachLessonDTO, int currentUserID);
     }
 
 

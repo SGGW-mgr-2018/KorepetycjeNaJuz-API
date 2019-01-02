@@ -141,12 +141,12 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 .Any(x => ((x.DateStart > startDate && x.DateStart < endDate) || (x.DateEnd > startDate && x.DateEnd < endDate)));
         }
 
-        public async Task CreateCoachLesson(CoachLessonCreateDTO coachLessonDTO)
+        public async Task CreateCoachLesson(CoachLessonCreateDTO coachLessonDTO, int currentUserID)
         {
             Address address = _mapper.Map<Address>(coachLessonDTO.Address);
-            address.CoachId = coachLessonDTO.CoachId;
+            address.CoachId = currentUserID;
             Address dbAddress = _addressRepository.Query()
-                .Where(add => add.CoachId == coachLessonDTO.CoachId)
+                .Where(add => add.CoachId == currentUserID)
                 .Where(add => add.Latitude == address.Latitude && add.Longitude == address.Longitude && add.City == address.City && add.Street == address.Street).FirstOrDefault();
 
             address = dbAddress == null 

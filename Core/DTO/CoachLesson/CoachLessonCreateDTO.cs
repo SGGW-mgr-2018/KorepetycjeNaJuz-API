@@ -7,11 +7,11 @@ namespace KorepetycjeNaJuz.Core.DTO
 {
     public class CoachLessonCreateDTO
     {
-        /// <summary>
-        /// Id korepetytora tworzącego lekcje
-        /// </summary>
-        [Range(1, Int32.MaxValue, ErrorMessage = "Pole musi być liczbą całkowitą większą niż 0.")]
-        public int CoachId { get; set; }
+        ///// <summary>
+        ///// Id korepetytora tworzącego lekcje
+        ///// </summary>
+        //[Range(1, Int32.MaxValue, ErrorMessage = "Pole musi być liczbą całkowitą większą niż 0.")]
+        //public int CoachId { get; set; }
 
         /// <summary>
         /// Id poziomów lekcji(ogłoszenia)
