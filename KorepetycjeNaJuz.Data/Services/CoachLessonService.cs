@@ -90,7 +90,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             if (filters.CoachId != null)
                 query = query.Where(x => x.CoachId == filters.CoachId.Value);
 
-            if (filters.Latitiude == null || filters.Longitiude == null || filters.Radius == null)
+            if (filters.Latitude == null || filters.Longitude == null || filters.Radius == null)
             {
                 // dodajemy wszystkie
                 output = _mapper.Map<List<CoachLessonDTO>>(query.ToList());
@@ -101,7 +101,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 foreach (CoachLesson coachLesson in query)
                 {
                     // po odległości
-                    var distance = Distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, filters.Latitiude.Value, filters.Longitiude.Value);
+                    var distance = Distance(coachLesson.Address.Latitude, coachLesson.Address.Longitude, filters.Latitude.Value, filters.Longitude.Value);
                     if (distance <= filters.Radius)
                     {
                         var coachLessonDTO = _mapper.Map<CoachLessonDTO>(coachLesson);
@@ -181,6 +181,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 item.LessonLevels = mappedLevels;
                 await _coachLessonRepository.AddAsync(item);
             }
+        }
+
+        public CoachLesson GetById(int id)
+        {
+            return _coachLessonRepository.GetById(id);
         }
     }
 }

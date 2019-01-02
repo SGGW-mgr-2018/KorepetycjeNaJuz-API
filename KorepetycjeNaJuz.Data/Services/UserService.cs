@@ -44,6 +44,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return result.Succeeded;
         }
 
+        public async Task<bool> DeleteUserAsync(int id)
+        {
+            return await _userRepository.DeleteAsync(id) > 0 ? true : false;
+        }
+
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             var users = await _userRepository.ListAllAsync();
@@ -68,6 +73,22 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         public async Task<bool> IsUserExistsAsync(int id)
         {
             return await GetUserAsync(id) != null;
+        }
+
+        public async Task<UserDTO> UpdateUserAsync(UserEditDTO userEditDTO)
+        {
+            var user = await _userRepository.GetByIdAsync(userEditDTO.Id);
+            user = _mapper.Map(userEditDTO, user);
+
+            if (userEditDTO.Password != null)
+            {
+                var newPassword = _userManager.PasswordHasher.HashPassword(user, userEditDTO.Password);
+                user.PasswordHash = newPassword;
+            }
+
+            await _userRepository.UpdateAsync(user);
+
+            return _mapper.Map<UserDTO>(user);
         }
     }
 }

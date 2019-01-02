@@ -6,8 +6,6 @@ using KorepetycjeNaJuz.Infrastructure;
 using KorepetycjeNaJuz.Infrastructure.Auth;
 using KorepetycjeNaJuz.Infrastructure.Repositories;
 using KorepetycjeNaJuz.Infrastructure.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -15,9 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Text;
 
 namespace KorepetycjeNaJuz
 {
@@ -33,20 +28,24 @@ namespace KorepetycjeNaJuz
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<KorepetycjeContext>( options =>
-                    options.UseSqlServer( this.Configuration.GetConnectionString( "DefaultConnection" ) ) );
-            KorepetycjeContext.ConnectionString = this.Configuration.GetConnectionString( "DefaultConnection" );
+            services.AddDbContext<KorepetycjeContext>(options =>
+                    options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
+            KorepetycjeContext.ConnectionString = this.Configuration.GetConnectionString("DefaultConnection");
 
-            SwaggerConfiguration.RegisterService( services );
+            SwaggerConfiguration.RegisterService(services);
 
+            CorsConfiguration.Register(services,
+                Configuration.GetSection(nameof(CorsConfigurationValues)).Get<CorsConfigurationValues>());
 
             services.AddIdentity<User,IdentityRole<int>>()
-            .AddEntityFrameworkStores<KorepetycjeContext>()
-            .AddDefaultTokenProviders();
+                    .AddEntityFrameworkStores<KorepetycjeContext>()
+                    .AddDefaultTokenProviders();
 
-            services.RegisterBearerPolicy( Configuration );            
+            services.RegisterBearerPolicy(Configuration);            
             
-            services.AddMvc().SetCompatibilityVersion( CompatibilityVersion.Version_2_1 );
+            services.AddMvc()
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddAutoMapper(); // Register AutoMapper
 
             RegisterServices(services);
@@ -93,13 +92,12 @@ namespace KorepetycjeNaJuz
             }
 
             app.UseHttpsRedirection();
-
             app.UseAuthentication();
-
+            app.UseCors(CorsConfiguration.CorsPolicyName);
             app.UseMvc();
 
             app.UseSwagger();
-            SwaggerConfiguration.RegisterUi( app );
+            SwaggerConfiguration.RegisterUi(app);
         }
     }
 }

@@ -1,23 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Infrastructure;
 using KorepetycjeNaJuz.Core.DTO;
-using AutoMapper;
 using NLog;
 using KorepetycjeNaJuz.Core.Interfaces;
-using System.Net;
 using KorepetycjeNaJuz.Core.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 
 namespace KorepetycjeNaJuz.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	public class LessonSubjectsController : ApiController
 	{
@@ -81,7 +74,7 @@ namespace KorepetycjeNaJuz.Controllers
 		[ProducesResponseType(404)]
 		[ProducesResponseType(500)]
 		[HttpDelete]
-		[Route("{id}")]
+		[Route("Delete/{id}")]
 #if !DEBUG
 		[Authorize("Bearer")]
 #endif
@@ -122,10 +115,7 @@ namespace KorepetycjeNaJuz.Controllers
 		[ProducesResponseType(404)]
 		[ProducesResponseType(500)]
 		[HttpGet]
-		[Route("{id}",  Name = "Get")]
-#if !DEBUG
-		[Authorize("Bearer")]
-#endif
+		[Route("Get/{id}")]
 		public async Task<IActionResult> Get([FromRoute] int id)
 		{
 			try
@@ -161,9 +151,6 @@ namespace KorepetycjeNaJuz.Controllers
 		[ProducesResponseType(500)]
 		[HttpGet]
 		[Route("GetAll")]
-#if !DEBUG
-		[Authorize("Bearer")]
-#endif
 		public async Task<IActionResult> GetAll()
 		{
 			try
@@ -195,9 +182,6 @@ namespace KorepetycjeNaJuz.Controllers
 		[ProducesResponseType(400)]
 		[ProducesResponseType(500)]
 		[HttpPost][Route("GetByFilter")]
-#if !DEBUG
-		[Authorize("Bearer")]
-#endif
 		public async Task<IActionResult> GetByFilter(LessonSubjectFilterDTO filter)
 		{
 			try

@@ -13,6 +13,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.1\KorepetycjeNaJuz.xml</DocumentationFile>
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,4 +40,15 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(ProjectDir)..\Core\KorepetycjeNaJuzCore.xml&quot; &quot;$(TargetDir)KorepetycjeNaJuzCore.xml&quot;&#xD;&#xA;" />
+  </Target>
+
+  <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish"> 
+	<ItemGroup> 
+		<DocFile Include="bin\**\**\KorepetycjeNaJuzCore.xml" /> 
+	</ItemGroup> 
+	<Copy SourceFiles="@(DocFile)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="false" /> 
+  </Target>
+  
 </Project>
