@@ -23,6 +23,8 @@ namespace KorepetycjeNaJuz.Core.Models
 
         public virtual ICollection<Lesson> Lessons { get; set; }
 
+        public string Description { get; set; }
+
         public decimal RatePerHour { get; set; }
 
         [DataType(DataType.DateTime)]

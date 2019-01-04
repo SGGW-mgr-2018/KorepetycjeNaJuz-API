@@ -51,6 +51,11 @@ namespace KorepetycjeNaJuz.Core.DTO
         public decimal RatePerHour { get; set; }
 
         /// <summary>
+        /// Opis lekcji
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
         /// Data rozpoczęcia lekcji(ogłoszenia)
         /// </summary>
         public DateTime DateStart { get; set; }
