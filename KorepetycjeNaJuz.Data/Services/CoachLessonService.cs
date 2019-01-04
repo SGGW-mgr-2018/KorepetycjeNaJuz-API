@@ -179,6 +179,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                     mappedLevels.Add(a);
                 }
                 item.LessonLevels = mappedLevels;
+                item.CoachId = currentUserID;
                 await _coachLessonRepository.AddAsync(item);
             }
         }
