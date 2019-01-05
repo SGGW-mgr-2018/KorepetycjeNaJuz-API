@@ -38,6 +38,35 @@ namespace KorepetycjeNaJuz.Controllers
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
+        /// <summary>
+        /// Zwraca listę lekcji na które zalogowany użytkownik jest zapisany (Uczeń) oraz
+        /// lekcje które użytkownik wystawił (Korepetytor)
+        /// </summary>
+        /// <param name="coachLessonCalendarFiltersDTO"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(IEnumerable<CoachLessonCalendarDTO>), 200)]
+        [ProducesResponseType(400), ProducesResponseType(401)]
+        [HttpGet, Route("Calendar"), Authorize("Bearer")]
+        public IActionResult Calendar([FromQuery] CoachLessonCalendarFiltersDTO coachLessonCalendarFiltersDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var currentUserId = User.GetUserId().Value;
+                var output = _coachLessonService.GetCoachLessonsCalendar(coachLessonCalendarFiltersDTO, currentUserId);
+
+                return Ok(output);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during CoachLessonController|Calendar");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
 
         /// <summary>
         /// Metoda wyszukująca lekcje po zadanych filtrach.

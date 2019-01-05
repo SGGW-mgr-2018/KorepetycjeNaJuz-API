@@ -62,6 +62,45 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return coachLesson.CoachId == userId;
         }
 
+        public IEnumerable<CoachLessonCalendarDTO> GetCoachLessonsCalendar(CoachLessonCalendarFiltersDTO filters, int currentUserId)
+        {
+            var coachLessonsDTO = new List<CoachLessonCalendarDTO>();
+
+            if (filters.DateFrom == null)
+                filters.DateFrom = DateTime.Now;
+
+            if (filters.DateTo == null)
+                filters.DateTo = filters.DateFrom.Value.AddDays(1);
+
+            // Lekcje w roli ucznia
+            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
+             x.DateStart >= filters.DateFrom &&
+             x.DateEnd <= filters.DateTo && 
+             x.Lessons.Any(y => y.StudentId == currentUserId));
+
+            var coachLessons = query.ToList();
+            var res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons);
+            coachLessonsDTO.AddRange(res);
+            for (int i = 0; i < coachLessonsDTO.Count(); i++)
+            {
+                coachLessonsDTO.ElementAt(i).UserRole = CoachLessonRole.Student;
+                var coachLesson = coachLessons.ElementAt(i);
+                var lesson = coachLesson.Lessons.Where(x => x.StudentId == currentUserId).First();
+                coachLessonsDTO.ElementAt(i).MyLesson = _mapper.Map<LessonDTO>(lesson);
+            }
+
+            // Lekcja w roli korepetytora
+            query = _coachLessonRepository.Query().Where(x =>
+                        x.DateStart >= filters.DateFrom &&
+                        x.DateEnd <= filters.DateTo &&
+                        x.CoachId == currentUserId);
+            coachLessons = query.ToList();
+            res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons).Select(x => { x.UserRole = CoachLessonRole.Teacher; return x; });
+            coachLessonsDTO.AddRange(res);
+
+            return coachLessonsDTO.OrderByDescending(x => x.DateStart);
+        }
+
         public IEnumerable<CoachLessonDTO> GetCoachLessonsByFilters(CoachLessonsByFiltersDTO filters)
         {
             List<CoachLessonDTO> output;
