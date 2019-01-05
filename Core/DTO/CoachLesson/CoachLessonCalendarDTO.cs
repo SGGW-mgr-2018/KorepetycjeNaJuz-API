@@ -1,4 +1,5 @@
 ﻿using KorepetycjeNaJuz.Core.Enums;
+using KorepetycjeNaJuz.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -89,5 +90,10 @@ namespace KorepetycjeNaJuz.Core.DTO
         /// Jeśli Rola korepetytor to Null
         /// </summary>
         public LessonDTO MyLesson { get; set; }
+
+        /// <summary>
+        /// Lekcje powiązane ze zgłoszeniem
+        /// </summary>
+        public virtual IEnumerable<LessonDTO> Lessons{ get; set; }
     }
 }

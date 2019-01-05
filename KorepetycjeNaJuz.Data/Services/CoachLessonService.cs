@@ -89,13 +89,17 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 coachLessonsDTO.ElementAt(i).MyLesson = _mapper.Map<LessonDTO>(lesson);
             }
 
-            // Lekcja w roli korepetytora
+            // Zgłoszenia w roli korepetytora
             query = _coachLessonRepository.Query().Where(x =>
                         x.DateStart >= filters.DateFrom &&
                         x.DateEnd <= filters.DateTo &&
                         x.CoachId == currentUserId);
+
             coachLessons = query.ToList();
+            
             res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons).Select(x => { x.UserRole = CoachLessonRole.Teacher; return x; });
+            
+            
             coachLessonsDTO.AddRange(res);
 
             return coachLessonsDTO.OrderByDescending(x => x.DateStart);
