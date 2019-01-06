@@ -39,6 +39,29 @@ namespace KorepetycjeNaJuz.Controllers
         }
 
         /// <summary>
+        /// Zwraca historię lekcji zalogowanego użytkownika
+        /// </summary>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(IEnumerable<CoachLessonHistoryDTO>), 200)]
+        [ProducesResponseType(400), ProducesResponseType(401)]
+        [HttpGet, Route("History"), Authorize("Bearer")]
+        public IActionResult History()
+        {
+            try
+            {
+                var currentUserId = User.GetUserId().Value;
+                var output = _coachLessonService.GetCoachLessonsHistory(currentUserId);
+
+                return Ok(output);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Error during CoachLessonController|History");
+                return StatusCode((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Zwraca listę lekcji na które zalogowany użytkownik jest zapisany (Uczeń) oraz
         /// lekcje które użytkownik wystawił (Korepetytor)
         /// </summary>

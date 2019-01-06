@@ -62,6 +62,32 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return coachLesson.CoachId == userId;
         }
 
+        public IEnumerable<CoachLessonHistoryDTO> GetCoachLessonsHistory(int userId)
+        {
+            var coachLessonsDTO = new List<CoachLessonHistoryDTO>();
+            var dateNow = DateTime.Now;
+
+            // Lekcje w roli ucznia
+            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
+             x.DateEnd <= dateNow &&
+             x.Lessons.Any(y => y.StudentId == userId && y.LessonStatusId == (int)LessonStatuses.Approved));
+
+            var coachLessons = query.ToList();
+            var res = _mapper.Map<IEnumerable<CoachLessonHistoryDTO>>(coachLessons);
+            coachLessonsDTO.AddRange(res);
+            for (int i = 0; i < coachLessonsDTO.Count(); i++)
+            {
+                var coachLesson = coachLessons.ElementAt(i);
+                var lesson = coachLesson.Lessons.Where(x => x.StudentId == userId).First();
+                coachLessonsDTO.ElementAt(i).RatingOfStudent = lesson.RatingOfStudent;
+                coachLessonsDTO.ElementAt(i).RatingOfCoach = lesson.RatingOfCoach;
+                coachLessonsDTO.ElementAt(i).OpinionOfCoach = lesson.OpinionOfCoach;
+                coachLessonsDTO.ElementAt(i).OpinionOfStudent = lesson.OpinionOfStudent;
+            }
+
+            return coachLessonsDTO;
+        }
+
         public IEnumerable<CoachLessonCalendarDTO> GetCoachLessonsCalendar(CoachLessonCalendarFiltersDTO filters, int currentUserId)
         {
             var coachLessonsDTO = new List<CoachLessonCalendarDTO>();

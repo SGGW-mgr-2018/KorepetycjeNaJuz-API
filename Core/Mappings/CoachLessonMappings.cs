@@ -2,6 +2,7 @@
 using KorepetycjeNaJuz.Core.Models;
 using KorepetycjeNaJuz.Core.DTO;
 using System;
+using System.Linq;
 
 namespace KorepetycjeNaJuz.Core.Mappings
 {
@@ -27,7 +28,13 @@ namespace KorepetycjeNaJuz.Core.Mappings
                 .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name))
                 .ForMember(x => x.Time, opts => opts.MapFrom(i => i.DateEnd.Subtract(i.DateStart).TotalMinutes))
                 .ForMember(x => x.UserRole, opts => opts.Ignore());
-           
+
+            CreateMap<CoachLesson, CoachLessonHistoryDTO>()
+                .ForMember(x => x.SubjectName, opts => opts.MapFrom(i => i.Subject.Name))
+                .ForMember(x => x.LessonLevelsName, opts => opts.MapFrom(i => string.Join(", ", i.LessonLevels.Select(x => x.LessonLevel.LevelName)).TrimEnd()))
+                .ForMember(x => x.CoachFirstName, opts => opts.MapFrom(i => i.Coach.FirstName))
+                .ForMember(x => x.CoachLastName, opts => opts.MapFrom(i => i.Coach.LastName))
+                .ForMember(x => x.Time, opts => opts.MapFrom(i => i.DateEnd.Subtract(i.DateStart).TotalMinutes));
         }
     }
 }
