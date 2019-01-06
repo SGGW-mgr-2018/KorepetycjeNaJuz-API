@@ -24,6 +24,7 @@ namespace KorepetycjeNaJuz.Core.Mappings
             CreateMap<CoachLesson, CoachLessonCalendarDTO>()
                 .ForMember(x => x.MyLesson, opts => opts.Ignore())
                 .ForMember(x => x.Lessons, opts => opts.MapFrom(i => i.Lessons))
+                .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name))
                 .ForMember(x => x.Time, opts => opts.MapFrom(i => i.DateEnd.Subtract(i.DateStart).TotalMinutes))
                 .ForMember(x => x.UserRole, opts => opts.Ignore());
            

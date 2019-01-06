@@ -87,6 +87,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 var coachLesson = coachLessons.ElementAt(i);
                 var lesson = coachLesson.Lessons.Where(x => x.StudentId == currentUserId).First();
                 coachLessonsDTO.ElementAt(i).MyLesson = _mapper.Map<LessonDTO>(lesson);
+                coachLessonsDTO.ElementAt(i).Lessons = null; // nie potrzebne jeśli użytkownik jest uczniem 
             }
 
             // Zgłoszenia w roli korepetytora
