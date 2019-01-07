@@ -98,10 +98,9 @@ namespace KorepetycjeNaJuz.Controllers
         /// <returns></returns>
         /// <response code="200">Lista dostępnych lekcji</response>
         /// <response code="400">Błedne parametry</response>
-        /// <response code="404">Nie znaleziono lekcji o podanych kryteriach</response>
         /// <response code="500">Błąd wewnętrzny</response>
         [ProducesResponseType(typeof(IEnumerable<CoachLessonDTO>), 200)]
-        [ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(500)]
+        [ProducesResponseType(400), ProducesResponseType(500)]
         [HttpGet, Route("CoachLessonsByFilters"), AllowAnonymous]        
         public IActionResult GetCoachLessonsByFilters([FromQuery, Required] CoachLessonsByFiltersDTO coachLessonsByFiltersDTO)
         {
@@ -114,7 +113,7 @@ namespace KorepetycjeNaJuz.Controllers
             {
                 var output = _coachLessonService.GetCoachLessonsByFilters(coachLessonsByFiltersDTO);
 
-                return output.Any() ? StatusCode(200, output) : NotFound("Lessons not found.");
+                return StatusCode(200, output);
             }
             catch (Exception ex)
             {
