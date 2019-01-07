@@ -102,8 +102,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
              x.DateStart >= filters.DateFrom &&
              x.DateEnd <= filters.DateTo &&
-             x.LessonStatusId != (int)LessonStatuses.Canceled && x.LessonStatusId != (int)LessonStatuses.Rejected &&
-             x.Lessons.Any(y => y.StudentId == currentUserId && x.LessonStatusId != (int)LessonStatuses.Rejected));
+             x.Lessons.Any(y => y.StudentId == currentUserId));
 
             var coachLessons = query.ToList();
             var res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons);
