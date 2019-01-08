@@ -65,11 +65,11 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             _lessonRepository.Update(lesson);
         }
 
-        public IEnumerable<LessonDTO> GetLessonsForCoachLesson(int coachLessonId)
+        public IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId)
         {
             var coachLesson = _coachLessonRepository.GetById(coachLessonId);
 
-            return _mapper.Map<IEnumerable<LessonDTO>>(coachLesson.Lessons);
+            return _mapper.Map<IEnumerable<LessonStudentDTO>>(coachLesson.Lessons);
         }
 
         public void RateLessonStudent(LessonRatingDTO lessonRatingDTO)

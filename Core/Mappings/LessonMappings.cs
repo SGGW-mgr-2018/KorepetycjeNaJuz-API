@@ -11,6 +11,9 @@ namespace KorepetycjeNaJuz.Core.Mappings
             CreateMap<LessonCreateDTO, Lesson>().ReverseMap();
 
             CreateMap<Lesson, LessonDTO>().ReverseMap();
+
+            CreateMap<Lesson, LessonStudentDTO>()
+                .ForMember(x => x.LessonStatusName, opts => opts.MapFrom(i => i.LessonStatus.Name));
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading.Tasks;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Models;
+using System.Collections.Generic;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -173,9 +174,9 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="401">Wymagana autoryzacja</response>
         /// <response code="403">Nie masz uprawnień, aby pobrać lekcje dla podanego ogłoszenia</response>
         /// <response code="404">Podane ogłoszenie nie istnieje</response>
-        [ProducesResponseType(200), ProducesResponseType(400)]
+        [ProducesResponseType(typeof(IEnumerable<LessonStudentDTO>), 200), ProducesResponseType(400)]
         [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
-        [HttpPost, Route("GetForCoachLesson/{coachLessonId}"), Authorize("Bearer")]
+        [HttpGet, Route("GetForCoachLesson/{coachLessonId}"), Authorize("Bearer")]
         public IActionResult GetLessonForCoachLesson([Required] int coachLessonId)
         {
             if (!ModelState.IsValid)

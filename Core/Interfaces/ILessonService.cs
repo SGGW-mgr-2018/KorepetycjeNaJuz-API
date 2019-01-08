@@ -12,7 +12,7 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         Lesson GetById(int lessonId);
         void RejectLesson(int lessonId);
         void ApproveLesson(int lessonId);
-        IEnumerable<LessonDTO> GetLessonsForCoachLesson(int coachLessonId);
+        IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId);
         void RateLessonStudent(LessonRatingDTO lessonRatingDTO);
         void RateLessonCoach(LessonRatingDTO lessonRatingDTO);
     }
