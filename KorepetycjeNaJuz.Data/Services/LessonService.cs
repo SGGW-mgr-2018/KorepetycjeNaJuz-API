@@ -12,15 +12,18 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
     {
         private readonly ILessonRepository _lessonRepository;
         private readonly ICoachLessonRepository _coachLessonRepository;
+        private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
 
         public LessonService(
             ILessonRepository lessonRepository,
             ICoachLessonRepository coachLessonRepository,
+            IMessageService messageService,
             IMapper mapper)
         {
             this._lessonRepository = lessonRepository;
             this._coachLessonRepository = coachLessonRepository;
+            this._messageService = messageService;
             this._mapper = mapper;
         }
 
@@ -36,6 +39,12 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
             coachLesson.LessonStatusId = (int)LessonStatuses.Reserved;
             await _coachLessonRepository.UpdateAsync(coachLesson);
+
+            Message m = new Message();
+            m.Content = string.Format("Użytkownik {0} {1} ({2}) zapisał się na Twoją lekcję ({3}) o {4}", lesson.Student.FirstName, lesson.Student.LastName,lesson.Student.Email,coachLesson.Subject,coachLesson.DateStart);
+            m.OwnerId = 0;
+            m.RecipientId = coachLesson.CoachId;
+            await _messageService.AddMessageAsync(m);
         }
 
         public bool IsLessonExists(int lessonId)
