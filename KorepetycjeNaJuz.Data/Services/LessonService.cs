@@ -4,6 +4,7 @@ using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
@@ -13,17 +14,20 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         private readonly ILessonRepository _lessonRepository;
         private readonly ICoachLessonRepository _coachLessonRepository;
         private readonly IMessageService _messageService;
+        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
 
         public LessonService(
             ILessonRepository lessonRepository,
             ICoachLessonRepository coachLessonRepository,
             IMessageService messageService,
+            IUserRepository userRepository,
             IMapper mapper)
         {
             this._lessonRepository = lessonRepository;
             this._coachLessonRepository = coachLessonRepository;
             this._messageService = messageService;
+            this._userRepository = userRepository;
             this._mapper = mapper;
         }
 
@@ -40,11 +44,19 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             coachLesson.LessonStatusId = (int)LessonStatuses.Reserved;
             await _coachLessonRepository.UpdateAsync(coachLesson);
 
-            Message m = new Message();
-            m.Content = string.Format("Użytkownik {0} {1} ({2}) zapisał się na Twoją lekcję ({3}) o {4}", lesson.Student.FirstName, lesson.Student.LastName,lesson.Student.Email,coachLesson.Subject,coachLesson.DateStart);
-            m.OwnerId = 0;
-            m.RecipientId = coachLesson.CoachId;
-            await _messageService.AddMessageAsync(m);
+            // Symulacja powiadomienia 'Wiadomosc od uzytkownika system'
+            var student = await _userRepository.GetByIdAsync(lesson.StudentId);
+            var studentFirstName = student.FirstName;
+            var studentLastNamePrefix = student.LastName.Trim();
+            studentLastNamePrefix = studentLastNamePrefix.Length > 1 ? studentLastNamePrefix.First().ToString().ToUpper() + "." : "";
+            var content = $"Użytkownik {studentFirstName} {studentLastNamePrefix} zapisał/a się na Twoją lekcję ({coachLesson.Subject.Name}) o {coachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var message = new Message
+            {
+                Content = content,
+                OwnerId = 0,
+                RecipientId = coachLesson.CoachId
+            };
+            await _messageService.AddMessageAsync(message);
         }
 
         public bool IsLessonExists(int lessonId)
