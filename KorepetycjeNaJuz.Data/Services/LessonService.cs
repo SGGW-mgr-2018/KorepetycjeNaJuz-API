@@ -3,6 +3,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,7 +55,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             {
                 Content = content,
                 OwnerId = 0,
-                RecipientId = coachLesson.CoachId
+                RecipientId = coachLesson.CoachId,
+                DateOfSending = DateTime.Now
             };
             await _messageService.AddMessageAsync(message);
         }
@@ -82,7 +84,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             {
                 Content = content,
                 OwnerId = 0,
-                RecipientId = lesson.StudentId
+                RecipientId = lesson.StudentId,
+                DateOfSending = DateTime.Now
             };
             await _messageService.AddMessageAsync(message);
         }
@@ -111,7 +114,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             {
                 Content = content,
                 OwnerId = 0,
-                RecipientId = lesson.StudentId
+                RecipientId = lesson.StudentId,
+                DateOfSending = DateTime.Now
             };
             await _messageService.AddMessageAsync(message);
         }
