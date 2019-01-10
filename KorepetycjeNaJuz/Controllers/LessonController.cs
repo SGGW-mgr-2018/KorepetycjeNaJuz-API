@@ -95,7 +95,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="404">Podana rezerwacja nie istnieje</response>
         [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(404), ProducesResponseType(401)]
         [HttpPost, Route("Reject"), Authorize("Bearer")]
-        public IActionResult RejectLesson([Required] int id)
+        public async Task<IActionResult> RejectLesson([Required] int id)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -111,7 +111,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.RejectLesson(id);
+                await _lessonService.RejectLessonAsync(id);
             }
             catch (Exception ex)
             {
@@ -153,7 +153,7 @@ namespace KorepetycjeNaJuz.Controllers
 
             try
             {
-                _lessonService.ApproveLesson(id);
+                _lessonService.ApproveLessonAsync(id);
             }
             catch (Exception ex)
             {

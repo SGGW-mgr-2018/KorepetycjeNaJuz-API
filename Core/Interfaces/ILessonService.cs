@@ -10,8 +10,8 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         Task CreateLessonAsync(LessonCreateDTO lessonCreateDTO);
         bool IsLessonExists(int lessonId);
         Lesson GetById(int lessonId);
-        void RejectLesson(int lessonId);
-        void ApproveLesson(int lessonId);
+        Task RejectLessonAsync(int lessonId);
+        Task ApproveLessonAsync(int lessonId);
         IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId);
         void RateLessonStudent(LessonRatingDTO lessonRatingDTO);
         void RateLessonCoach(LessonRatingDTO lessonRatingDTO);

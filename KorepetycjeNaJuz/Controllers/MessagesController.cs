@@ -94,6 +94,10 @@ namespace KorepetycjeNaJuz.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+                if (message.RecipientId == 0) // Użytkownik System
+                {
+                    return BadRequest();
+                }
 
                 if (! await _userService.IsUserExistsAsync(message.RecipientId))
                 {

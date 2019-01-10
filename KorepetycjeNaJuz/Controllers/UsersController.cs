@@ -65,7 +65,7 @@ namespace KorepetycjeNaJuz.Controllers
         public async Task<IActionResult> GetUser([FromRoute] int id)
         {
             _logger.Info(string.Format("Entered GetUser({0}) method.", id));
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || id == 0) // Użytkownik System
                 return BadRequest(ModelState);
 
             var user = await _userService.GetUserAsync(id);
@@ -169,7 +169,7 @@ namespace KorepetycjeNaJuz.Controllers
         {
             _logger.Info(string.Format("Executing DeleteUser({0}) method...", id));
 
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || id == 0) // Użytkownik System
                 return BadRequest(ModelState);
 
             var isUserExists = await _userService.IsUserExistsAsync(id);

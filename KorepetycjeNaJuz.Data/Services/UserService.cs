@@ -52,7 +52,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
         public async Task<IEnumerable<UserDTO>> GetAllUsersAsync()
         {
             var users = await _userRepository.ListAllAsync();
-
+            users = users.Where(x => x.Id != 0).ToList(); // Pominięcie użytkownika SYSTEM
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 

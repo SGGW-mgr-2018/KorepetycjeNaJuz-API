@@ -49,7 +49,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var studentFirstName = student.FirstName;
             var studentLastNamePrefix = student.LastName.Trim();
             studentLastNamePrefix = studentLastNamePrefix.Length > 1 ? studentLastNamePrefix.First().ToString().ToUpper() + "." : "";
-            var content = $"Użytkownik {studentFirstName} {studentLastNamePrefix} zapisał/a się na Twoją lekcję ({coachLesson.Subject.Name}) o {coachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var content = $"Użytkownik {studentFirstName} {studentLastNamePrefix} zapisał się na Twoją lekcję ({coachLesson.Subject.Name} - {coachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}).";
             var message = new Message
             {
                 Content = content,
@@ -64,12 +64,12 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return _lessonRepository.GetById(lessonId) != null;
         }
 
-        public void RejectLesson(int id)
+        public async Task RejectLessonAsync(int id)
         {
             var lesson = _lessonRepository.GetById(id);
 
             lesson.LessonStatusId = (int)LessonStatuses.Rejected;
-            _lessonRepository.UpdateAsync(lesson);
+            _lessonRepository.Update(lesson);
 
             // Symulacja powiadomienia 'Wiadomosc od uzytkownika system'
             var coach = _userRepository.GetById(lesson.CoachLesson.CoachId);
@@ -77,14 +77,14 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var coachFirstName = coach.FirstName;
             var coachLastNamePrefix = coach.LastName.Trim();
             coachLastNamePrefix = coachLastNamePrefix.Length > 1 ? coachLastNamePrefix.First().ToString().ToUpper() + "." : "";
-            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} odrzucił/a lekcję ({lesson.CoachLesson.Subject}) o {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} odrzucił/a Twoje zgłoszenie na lekcję ({lesson.CoachLesson.Subject.Name} - {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}).";
             var message = new Message
             {
                 Content = content,
                 OwnerId = 0,
                 RecipientId = lesson.StudentId
             };
-            _messageService.AddMessageAsync(message);
+            await _messageService.AddMessageAsync(message);
         }
 
         public Lesson GetById(int id)
@@ -92,7 +92,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return _lessonRepository.GetById(id);
         }
 
-        public void ApproveLesson(int id)
+        public async Task ApproveLessonAsync(int id)
         {
             var lesson = _lessonRepository.GetById(id);
             lesson.LessonStatusId = (int)LessonStatuses.Approved;
@@ -106,15 +106,14 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var coachFirstName = coach.FirstName;
             var coachLastNamePrefix = coach.LastName.Trim();
             coachLastNamePrefix = coachLastNamePrefix.Length > 1 ? coachLastNamePrefix.First().ToString().ToUpper() + "." : "";
-            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} potwierdził/a lekcję ({lesson.CoachLesson.Subject}) o {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} potwierdził/a Twoje zgłoszenie na lekcję ({lesson.CoachLesson.Subject.Name} - {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}).";
             var message = new Message
             {
                 Content = content,
                 OwnerId = 0,
                 RecipientId = lesson.StudentId
             };
-            _messageService.AddMessageAsync(message);
-
+            await _messageService.AddMessageAsync(message);
         }
 
         public IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId)
