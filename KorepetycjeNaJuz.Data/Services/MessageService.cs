@@ -33,6 +33,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
         public Task AddMessageAsync(Message message)
         {
+            message.Content = message.Content.Trim().TrimEnd(new char[] { '\r', '\n', });
             return _messageRepository.AddAsync(message);
         }
 
