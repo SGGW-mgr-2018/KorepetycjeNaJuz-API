@@ -70,6 +70,21 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
             lesson.LessonStatusId = (int)LessonStatuses.Rejected;
             _lessonRepository.UpdateAsync(lesson);
+
+            // Symulacja powiadomienia 'Wiadomosc od uzytkownika system'
+            var coach = _userRepository.GetById(lesson.CoachLesson.CoachId);
+
+            var coachFirstName = coach.FirstName;
+            var coachLastNamePrefix = coach.LastName.Trim();
+            coachLastNamePrefix = coachLastNamePrefix.Length > 1 ? coachLastNamePrefix.First().ToString().ToUpper() + "." : "";
+            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} odrzucił/a lekcję ({lesson.CoachLesson.Subject}) o {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var message = new Message
+            {
+                Content = content,
+                OwnerId = 0,
+                RecipientId = lesson.StudentId
+            };
+            _messageService.AddMessageAsync(message);
         }
 
         public Lesson GetById(int id)
@@ -84,6 +99,22 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             lesson.CoachLesson.LessonStatusId = (int)LessonStatuses.Approved;
 
             _lessonRepository.Update(lesson);
+
+            // Symulacja powiadomienia 'Wiadomosc od uzytkownika system'
+            var coach = _userRepository.GetById(lesson.CoachLesson.CoachId);
+
+            var coachFirstName = coach.FirstName;
+            var coachLastNamePrefix = coach.LastName.Trim();
+            coachLastNamePrefix = coachLastNamePrefix.Length > 1 ? coachLastNamePrefix.First().ToString().ToUpper() + "." : "";
+            var content = $"Korepetytor {coachFirstName} {coachLastNamePrefix} potwierdził/a lekcję ({lesson.CoachLesson.Subject}) o {lesson.CoachLesson.DateStart.ToString("yyyy-MM-dd HH:mm")}";
+            var message = new Message
+            {
+                Content = content,
+                OwnerId = 0,
+                RecipientId = lesson.StudentId
+            };
+            _messageService.AddMessageAsync(message);
+
         }
 
         public IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId)
