@@ -16,9 +16,9 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             _messageRepository = messageRepository;
         }
 
-        public Task<List<Message>> GetConversationWithUserAsync(int user1Id, int user2Id)
+        public async Task<List<Message>> GetConversationWithUserAsync(int user1Id, int user2Id)
         {
-            return _messageRepository.GetConversationWithUserAsync(user1Id, user2Id);
+            return await _messageRepository.GetConversationWithUserAsync(user1Id, user2Id);
         }
 
         public async Task<IEnumerable<IGrouping<int, Message>>> GetConversation(int userId)
@@ -26,25 +26,25 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             return (await _messageRepository.GetUserMessagesAsync(userId)).GroupBy(m => m.OwnerId == userId ? m.RecipientId : m.OwnerId);
         }
 
-        public Task<Dictionary<int, User>> GetInterlocutorsAsync(int userId)
+        public async Task<Dictionary<int, User>> GetInterlocutorsAsync(int userId)
         {
-            return _messageRepository.GetInterlocutorsAsync(userId);
+            return await _messageRepository.GetInterlocutorsAsync(userId);
         }
 
-        public Task AddMessageAsync(Message message)
+        public async Task AddMessageAsync(Message message)
         {
             message.Content = message.Content.Trim().TrimEnd(new char[] { '\r', '\n', });
-            return _messageRepository.AddAsync(message);
+            await _messageRepository.AddAsync(message);
         }
 
-        public Task<Message> GetMessageAsync(int id)
+        public async Task<Message> GetMessageAsync(int id)
         {
-            return _messageRepository.GetByIdAsync(id);
+            return await _messageRepository.GetByIdAsync(id);
         }
 
-        public Task RemoveAsync(int id)
+        public async Task RemoveAsync(int id)
         {
-            return _messageRepository.DeleteAsync(id);
+            await _messageRepository.DeleteAsync(id);
         }
     }
 }

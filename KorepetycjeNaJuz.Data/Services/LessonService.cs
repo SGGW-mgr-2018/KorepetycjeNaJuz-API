@@ -101,7 +101,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             lesson.LessonStatusId = (int)LessonStatuses.Approved;
             lesson.CoachLesson.LessonStatusId = (int)LessonStatuses.Approved;
 
-            _lessonRepository.Update(lesson);
+            await _lessonRepository.UpdateAsync(lesson);
 
             // Symulacja powiadomienia 'Wiadomosc od uzytkownika system'
             var coach = _userRepository.GetById(lesson.CoachLesson.CoachId);
@@ -118,6 +118,12 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 DateOfSending = DateTime.Now
             };
             await _messageService.AddMessageAsync(message);
+
+            var lessonsToReject = lesson.CoachLesson.Lessons.Where(x => x.Id != id && x.LessonStatusId != (int)LessonStatuses.Rejected);
+            foreach (var lessonItem in lessonsToReject)
+            {
+                await RejectLessonAsync(lessonItem.Id);
+            }
         }
 
         public IEnumerable<LessonStudentDTO> GetLessonsForCoachLesson(int coachLessonId)
