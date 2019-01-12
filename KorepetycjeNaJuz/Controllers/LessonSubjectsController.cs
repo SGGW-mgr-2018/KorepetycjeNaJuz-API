@@ -50,7 +50,7 @@ namespace KorepetycjeNaJuz.Controllers
 
 				var subject = await subjectService.CreateAsync(create);
 
-				return CreatedAtRoute("Get", new { id = subject.Id }, subject);
+				return CreatedAtRoute("GetLessonSubject", new { id = subject.Id }, subject);
 			}
 			catch (Exception e)
 			{
@@ -115,7 +115,7 @@ namespace KorepetycjeNaJuz.Controllers
 		[ProducesResponseType(404)]
 		[ProducesResponseType(500)]
 		[HttpGet]
-		[Route("Get/{id}")]
+		[Route("Get/{id}", Name = "GetLessonSubject")]
 		public async Task<IActionResult> Get([FromRoute] int id)
 		{
 			try
