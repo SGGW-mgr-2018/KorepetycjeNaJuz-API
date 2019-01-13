@@ -57,6 +57,7 @@ namespace KorepetycjeNaJuz
             services.AddScoped<IOAuthService, OAuthService>();
             services.AddScoped<ILessonService, LessonService>();
             services.AddScoped<ILessonSubjectService, LessonSubjectService>();
+            services.AddScoped<ILessonLevelService, LessonLevelService>();
             services.AddScoped<ICoachLessonService, CoachLessonService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IMessageService, MessageService>();
