@@ -7,9 +7,14 @@ namespace KorepetycjeNaJuz.Core.DTO
     public class CoachLessonHistoryDTO
     {
         /// <summary>
-        /// Id lekcji
+        /// Id ogłoszenia 
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// Id lekcji (potrzebne do wystawienia opinii)
+        /// </summary>
+        public int LessonId { get; set; }
 
         /// <summary>
         /// Tytuł lekcji

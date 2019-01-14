@@ -89,6 +89,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             {
                 var coachLesson = coachLessons.ElementAt(i);
                 var lesson = coachLesson.Lessons.Where(x => x.StudentId == userId).First();
+                coachLessonsDTO.ElementAt(i).LessonId = lesson.Id;
                 coachLessonsDTO.ElementAt(i).RatingOfStudent = lesson.RatingOfStudent;
                 coachLessonsDTO.ElementAt(i).RatingOfCoach = lesson.RatingOfCoach;
                 coachLessonsDTO.ElementAt(i).OpinionOfCoach = lesson.OpinionOfCoach;
