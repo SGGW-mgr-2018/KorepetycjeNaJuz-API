@@ -115,5 +115,15 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
         {
             this._dbContext.ChangeTracker.LazyLoadingEnabled = false;
         }
+
+        public void SaveChanges()
+        {
+            this._dbContext.SaveChanges();
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await this._dbContext.SaveChangesAsync();
+        }
     }
 }

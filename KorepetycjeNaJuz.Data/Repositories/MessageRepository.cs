@@ -19,7 +19,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
 
         public Task<List<Message>> GetConversationWithUserAsync(int user1Id, int user2Id)
         {
-            return _context.Messages.AsNoTracking()
+            return _context.Messages
                 .Where(m => m.OwnerId == user1Id && m.RecipientId == user2Id || m.OwnerId == user2Id && m.RecipientId == user1Id)
                 .ToListAsync();
         }

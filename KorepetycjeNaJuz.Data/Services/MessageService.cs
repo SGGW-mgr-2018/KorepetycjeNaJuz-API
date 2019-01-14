@@ -18,7 +18,16 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
 
         public async Task<List<Message>> GetConversationWithUserAsync(int user1Id, int user2Id)
         {
-            return await _messageRepository.GetConversationWithUserAsync(user1Id, user2Id);
+            var conversation = await _messageRepository.GetConversationWithUserAsync(user1Id, user2Id);
+
+            var unreadMessages = conversation.Where(x => !x.IsRead && x.OwnerId == user2Id);
+            if (unreadMessages.Count() > 0)
+            {
+                unreadMessages.ToList().ForEach(x => x.IsRead = true);
+                await _messageRepository.SaveChangesAsync();
+            }
+
+            return conversation;
         }
 
         public async Task<IEnumerable<IGrouping<int, Message>>> GetConversation(int userId)

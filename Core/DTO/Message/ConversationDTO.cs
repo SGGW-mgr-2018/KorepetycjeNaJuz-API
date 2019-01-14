@@ -11,15 +11,17 @@ namespace KorepetycjeNaJuz.Core.DTO.Message
         public MessageDTO LastMessage { get; private set; }
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
+        public int NumberOfUnreadMessages { get; set; }
 
-        public static ConversationDTO Create(IGrouping<int, Models.Message> conversation, Dictionary<int, Models.User> users)
+        public static ConversationDTO Create(IGrouping<int, Models.Message> conversation, Dictionary<int, Models.User> users, int currentUserId)
         {
             return new ConversationDTO
             {
                 UserId = conversation.Key,
-                LastMessage = new MessageDTO(conversation.OrderByDescending(m => m.DateOfSending).First()),
+                LastMessage = new MessageDTO(conversation.OrderByDescending(m => m.DateOfSending).First(), currentUserId),
                 FirstName = users[conversation.Key].FirstName,
-                LastName = users[conversation.Key].LastName
+                LastName = users[conversation.Key].LastName,
+                NumberOfUnreadMessages = conversation.Where(x => !x.IsRead && x.OwnerId == conversation.Key).Count()
             };
         }
     }

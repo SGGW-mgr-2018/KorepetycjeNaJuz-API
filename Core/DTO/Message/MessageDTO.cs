@@ -6,13 +6,14 @@ namespace KorepetycjeNaJuz.Core.DTO.Message
     public class MessageDTO
     {
         public MessageDTO() { }
-        public MessageDTO(Models.Message m)
+        public MessageDTO(Models.Message m, int currentUserId)
         {
             Id = m.Id;
             RecipientId = m.RecipientId;
             Content = m.Content;
             OwnerId = m.OwnerId;
             DateOfSending = m.DateOfSending;
+            IsRead = m.IsRead;
         }
 
         public int Id { get; }
@@ -24,5 +25,10 @@ namespace KorepetycjeNaJuz.Core.DTO.Message
         /// UTC datetime
         /// </summary>
         public DateTime DateOfSending { get; }
+
+        /// <summary>
+        /// Określa czy wiadomość została odczytana
+        /// </summary>
+        public bool IsRead { get; set; }
     }
 }

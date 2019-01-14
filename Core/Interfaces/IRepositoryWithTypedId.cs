@@ -23,5 +23,7 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         IQueryable<T> Query();
         void EnableLazyLoading();
         void DisableLazyLoading();
+        void SaveChanges();
+        Task SaveChangesAsync();
     }
 }

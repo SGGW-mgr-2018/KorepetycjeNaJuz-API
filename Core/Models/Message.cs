@@ -23,5 +23,7 @@ namespace KorepetycjeNaJuz.Core.Models
 
         [DataType(DataType.DateTime)]
         public DateTime DateOfSending { get; set; }
+
+        public bool IsRead { get; set; }
     }
 }

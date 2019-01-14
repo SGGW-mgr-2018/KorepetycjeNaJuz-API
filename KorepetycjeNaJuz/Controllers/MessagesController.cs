@@ -43,7 +43,7 @@ namespace KorepetycjeNaJuz.Controllers
             {
                 var currentUserId = User.GetUserId().Value;
                 return Ok((await _messageService.GetConversationWithUserAsync(currentUserId, id))
-                    .Select(m => new MessageDTO(m)));
+                    .Select(m => new MessageDTO(m, currentUserId)));
             }
             catch (Exception ex)
             {
@@ -66,7 +66,7 @@ namespace KorepetycjeNaJuz.Controllers
                 var users = await _messageService.GetInterlocutorsAsync(currentUserId);//_context.Users.AsNoTracking().Where(u => usersId.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
 
 
-                return Ok((await _messageService.GetConversation(currentUserId)).Select(g => ConversationDTO.Create(g, users)));
+                return Ok((await _messageService.GetConversation(currentUserId)).Select(g => ConversationDTO.Create(g, users, currentUserId)));
             }
             catch (Exception ex)
             {
@@ -112,7 +112,8 @@ namespace KorepetycjeNaJuz.Controllers
                     DateOfSending = now,
                     OwnerId = currentUserId,
                     RecipientId = message.RecipientId,
-                    Content = message.Content
+                    Content = message.Content,
+                    IsRead = false
                 });
 
                 return StatusCode((int)HttpStatusCode.Created);
