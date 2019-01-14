@@ -21,5 +21,7 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         int DeleteRange( IEnumerable<T> objects );
         Task<int> DeleteRangeAsync( IEnumerable<T> objects );
         IQueryable<T> Query();
+        void EnableLazyLoading();
+        void DisableLazyLoading();
     }
 }

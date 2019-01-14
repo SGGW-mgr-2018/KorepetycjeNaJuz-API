@@ -3,6 +3,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Enums;
 using KorepetycjeNaJuz.Core.Interfaces;
 using KorepetycjeNaJuz.Core.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,10 +68,19 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             var coachLessonsDTO = new List<CoachLessonHistoryDTO>();
             var dateNow = DateTime.Now;
 
+            _coachLessonRepository.DisableLazyLoading();
+
             // Lekcje w roli ucznia
-            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
-             x.DateEnd <= dateNow &&
-             x.Lessons.Any(y => y.StudentId == userId && y.LessonStatusId == (int)LessonStatuses.Approved));
+            IQueryable<CoachLesson> query = _coachLessonRepository
+                .Query()
+                .Include(x => x.Coach)
+                .Include(x => x.Subject)
+                .Include(x => x.LessonLevels)
+                    .ThenInclude((CoachLessonLevel x) => x.LessonLevel)
+                .Include(x => x.Lessons)
+                .Where(x =>
+                     x.DateEnd <= dateNow &&
+                     x.Lessons.Any(y => y.StudentId == userId && y.LessonStatusId == (int)LessonStatuses.Approved));
 
             var coachLessons = query.ToList();
             var res = _mapper.Map<IEnumerable<CoachLessonHistoryDTO>>(coachLessons);
@@ -85,6 +95,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 coachLessonsDTO.ElementAt(i).OpinionOfStudent = lesson.OpinionOfStudent;
             }
 
+            _coachLessonRepository.EnableLazyLoading();
+
             return coachLessonsDTO;
         }
 
@@ -98,11 +110,23 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             if (filters.DateTo == null)
                 filters.DateTo = filters.DateFrom.Value.AddDays(30);
 
+            _coachLessonRepository.DisableLazyLoading();
+
             // Lekcje w roli ucznia
-            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
-             x.DateStart >= filters.DateFrom &&
-             x.DateEnd <= filters.DateTo &&
-             x.Lessons.Any(y => y.StudentId == currentUserId));
+            IQueryable<CoachLesson> query = _coachLessonRepository
+                .Query()
+                .Include(x => x.Address)
+                .Include(x => x.Coach)
+                .Include(x => x.LessonStatus)
+                .Include(x => x.Subject)
+                .Include(x => x.LessonLevels)
+                    .ThenInclude((CoachLessonLevel x) => x.LessonLevel)
+                .Include(x => x.Lessons)
+                    .ThenInclude((Lesson x) => x.Student)
+                .Where(x =>
+                     x.DateStart >= filters.DateFrom &&
+                     x.DateEnd <= filters.DateTo &&
+                     x.Lessons.Any(y => y.StudentId == currentUserId));
 
             var coachLessons = query.ToList();
             var res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons);
@@ -117,17 +141,28 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             }
 
             // Zgłoszenia w roli korepetytora
-            query = _coachLessonRepository.Query().Where(x =>
-                        x.DateStart >= filters.DateFrom &&
-                        x.DateEnd <= filters.DateTo &&
-                        x.CoachId == currentUserId);
+            query = _coachLessonRepository
+                .Query()
+                .Include(x => x.Address)
+                .Include(x => x.Coach)
+                .Include(x => x.LessonStatus)
+                .Include(x => x.Subject)
+                .Include(x => x.LessonLevels)
+                    .ThenInclude((CoachLessonLevel x) => x.LessonLevel)
+                .Include(x => x.Lessons)
+                    .ThenInclude((Lesson x) => x.Student)
+                .Where(x =>
+                    x.DateStart >= filters.DateFrom &&
+                    x.DateEnd <= filters.DateTo &&
+                    x.CoachId == currentUserId);
 
             coachLessons = query.ToList();
-            
-            res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons).Select(x => { x.UserRole = CoachLessonRole.Teacher; return x; });
-            
+
+            res = _mapper.Map<IEnumerable<CoachLessonCalendarDTO>>(coachLessons);
             
             coachLessonsDTO.AddRange(res);
+
+            _coachLessonRepository.EnableLazyLoading();
 
             return coachLessonsDTO.OrderByDescending(x => x.DateStart);
         }
@@ -142,11 +177,25 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             if (filters.DateTo == null)
                 filters.DateTo = filters.DateFrom.Value.AddDays(1);
 
-            IQueryable<CoachLesson> query = _coachLessonRepository.Query().Where(x =>
-                (x.LessonStatus.Id == (int)LessonStatuses.WaitingForStudents ||
-                 x.LessonStatus.Id == (int)LessonStatuses.Reserved) &&
-                x.DateStart >= filters.DateFrom &&
-                x.DateEnd <= filters.DateTo);
+            _coachLessonRepository.DisableLazyLoading();
+
+            IQueryable<CoachLesson> query = _coachLessonRepository
+                .Query()
+                .Include(x => x.Address)
+                .Include(x => x.Coach)
+                .Include(x => x.LessonStatus)
+                .Include(x => x.Subject)
+                .Include(x => x.LessonLevels)
+                    .ThenInclude((CoachLessonLevel x) => x.LessonLevel)
+                .Include(x => x.Lessons)
+                    .ThenInclude((Lesson x) => x.Student)
+                .Include(x => x.Lessons)
+                    .ThenInclude((Lesson x) => x.LessonStatus)
+                .Where(x =>
+                    (x.LessonStatus.Id == (int)LessonStatuses.WaitingForStudents ||
+                     x.LessonStatus.Id == (int)LessonStatuses.Reserved) &&
+                    x.DateStart >= filters.DateFrom &&
+                    x.DateEnd <= filters.DateTo);
 
             // po tytule
             if (filters.SubjectId != null)
@@ -179,6 +228,8 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                     }
                 }
             }
+
+            _coachLessonRepository.EnableLazyLoading();
 
             return output;
         }

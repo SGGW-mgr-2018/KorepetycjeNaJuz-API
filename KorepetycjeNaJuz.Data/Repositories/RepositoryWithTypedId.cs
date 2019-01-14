@@ -105,5 +105,15 @@ namespace KorepetycjeNaJuz.Infrastructure.Repositories
             this._dbContext.RemoveRange( objects );
             return await this._dbContext.SaveChangesAsync();
         }
+
+        public void EnableLazyLoading()
+        {
+            this._dbContext.ChangeTracker.LazyLoadingEnabled = true;
+        }
+
+        public void DisableLazyLoading()
+        {
+            this._dbContext.ChangeTracker.LazyLoadingEnabled = false;
+        }
     }
 }
