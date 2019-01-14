@@ -151,6 +151,11 @@ namespace KorepetycjeNaJuz.Controllers
                 ModelState.AddModelError("Time", "Nie da się poprawnie rozłożyć lekcji w danym przedziale czasowym.");
                 return BadRequest(ModelState);
             }
+            if ((span.TotalMinutes / coachLessonDTO.Time) > 8)
+            {
+                ModelState.AddModelError("DateEnd", "Nie można utworzyć więcej niż 8 lekcji za jednym razem. Zmniejsz przedział czasowy lub zwiększ czas lekcji.");
+                return BadRequest(ModelState);
+            }
 
             try
             {

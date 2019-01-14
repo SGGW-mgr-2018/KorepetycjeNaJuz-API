@@ -46,9 +46,9 @@ namespace KorepetycjeNaJuz.Core.DTO
         public DateTime? DateEnd { get; set; }
 
         /// <summary>
-        /// Informacja o czasie trwania lekcji(ogłoszenia)
+        /// Informacja o czasie trwania lekcji(ogłoszenia) (minuty)
         /// </summary>
-        [Range(1, Int32.MaxValue, ErrorMessage = "Pole musi być liczbą całkowitą większą niż 0.")]
+        [Range(30, 180, ErrorMessage = "Czas pojedynczej lekcji musi zawierać się w przedziale od 30 do 180 minut.")]
         public int Time { get; set; }
 
         /// <summary>
