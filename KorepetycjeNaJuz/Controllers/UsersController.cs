@@ -13,6 +13,7 @@ using KorepetycjeNaJuz.Core.DTO;
 using KorepetycjeNaJuz.Core.Interfaces;
 using System.Net;
 using Microsoft.AspNetCore.Identity;
+using KorepetycjeNaJuz.Core.Helpers;
 
 namespace KorepetycjeNaJuz.Controllers
 {
@@ -85,9 +86,10 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="304">Wystąpił błąd podczas edycji danych</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
         /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="403">Brak uprawnień/response>
         /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         [ProducesResponseType(typeof(UserDTO), 200), ProducesResponseType(304), ProducesResponseType(400)]
-        [ProducesResponseType(401), ProducesResponseType(404)]
+        [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
         [HttpPut, Route("Update"), Authorize("Bearer")]
         public async Task<IActionResult> PutUser([FromBody] UserEditDTO userEditDTO)
         {
@@ -99,6 +101,9 @@ namespace KorepetycjeNaJuz.Controllers
             bool isUserExists = await _userService.IsUserExistsAsync(userEditDTO.Id);
             if (!isUserExists)
                 return NotFound();
+
+            if (this.User.GetUserId().Value != userEditDTO.Id)
+                return Forbid();
 
             try
             {
@@ -163,8 +168,11 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="200">Poprawnie usunięto użytkownika</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
         /// <response code="401">Wymagana autoryzacja</response>
+        /// <response code="403">Brak uprawnień/response>
         /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         [HttpDelete, Route("Delete/{id}"), Authorize("Bearer")]
+        [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(401)]
+        [ProducesResponseType(403), ProducesResponseType(404)]
         public async Task<IActionResult> DeleteUser([FromRoute] int id)
         {
             _logger.Info(string.Format("Executing DeleteUser({0}) method...", id));
@@ -175,6 +183,9 @@ namespace KorepetycjeNaJuz.Controllers
             var isUserExists = await _userService.IsUserExistsAsync(id);
             if (!isUserExists)
                 return NotFound();
+
+            if (this.User.GetUserId().Value != id)
+                return Forbid();
 
             try
             {
