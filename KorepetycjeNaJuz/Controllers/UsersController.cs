@@ -86,7 +86,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="304">Wystąpił błąd podczas edycji danych</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
         /// <response code="401">Wymagana autoryzacja</response>
-        /// <response code="403">Brak uprawnień/response>
+        /// <response code="403">Brak uprawnień</response>
         /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         [ProducesResponseType(typeof(UserDTO), 200), ProducesResponseType(304), ProducesResponseType(400)]
         [ProducesResponseType(401), ProducesResponseType(403), ProducesResponseType(404)]
@@ -168,7 +168,7 @@ namespace KorepetycjeNaJuz.Controllers
         /// <response code="200">Poprawnie usunięto użytkownika</response>
         /// <response code="400">Przekazano niepoprawne zapytanie</response>
         /// <response code="401">Wymagana autoryzacja</response>
-        /// <response code="403">Brak uprawnień/response>
+        /// <response code="403">Brak uprawnień</response>
         /// <response code="404">Nie znaleziono użytkownika o podanym numerze ID</response>
         [HttpDelete, Route("Delete/{id}"), Authorize("Bearer")]
         [ProducesResponseType(200), ProducesResponseType(400), ProducesResponseType(401)]
