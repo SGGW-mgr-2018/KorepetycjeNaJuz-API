@@ -26,6 +26,14 @@ namespace KorepetycjeNaJuz.Core.DTO
         public string CoachLastName { get; set; }
 
         /// <summary>
+        /// Opisuje średnią ocen użytkownika 
+        /// jako korepetytora (jeśli nie prowadził lekcji ma 0)
+        /// brane są pod uwagę tylko te lekcje, które mają status Approved 
+        /// oraz mają wystawioną ocenę
+        /// </summary>
+        public float CoachRating { get; set; }
+
+        /// <summary>
         /// Status lekcji(ogłoszenia)
         /// </summary>
         public string LessonStatusName { get; set; }

@@ -13,6 +13,7 @@ namespace KorepetycjeNaJuz.Core.Mappings
         {
             CreateMap<CoachLesson, CoachLessonDTO>()
                 .ForMember(x => x.LessonSubject, opts => opts.MapFrom(i => i.Subject.Name))
+                .ForMember(x => x.CoachRating, opts => opts.MapFrom(i => i.Coach.CoachRating))
                 .ForMember(x => x.Time, opts => opts.MapFrom(i => i.DateEnd.Subtract(i.DateStart).TotalMinutes))
                 .ForMember(x => x.Description, opts => opts.NullSubstitute(string.Empty));
 

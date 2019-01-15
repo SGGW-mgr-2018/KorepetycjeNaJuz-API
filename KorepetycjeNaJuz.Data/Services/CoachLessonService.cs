@@ -80,6 +80,7 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
                 .Include(x => x.Lessons)
                 .Where(x =>
                      x.DateEnd <= dateNow &&
+                     x.LessonStatusId == (int)LessonStatuses.Approved &&
                      x.Lessons.Any(y => y.StudentId == userId && y.LessonStatusId == (int)LessonStatuses.Approved));
 
             var coachLessons = query.ToList();

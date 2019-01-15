@@ -20,14 +20,17 @@ namespace KorepetycjeNaJuz.Controllers
     {
         private readonly ILessonService _lessonService;
         private readonly ICoachLessonService _coachLessonService;
+        private readonly IUserService _userService;
         private readonly ILogger _logger;
 
         public LessonController(
             ILessonService lessonService, 
-            ICoachLessonService coachLessonService)
+            ICoachLessonService coachLessonService,
+            IUserService userService)
         {
             this._lessonService = lessonService;
             this._coachLessonService = coachLessonService;
+            this._userService = userService;
             this._logger = LogManager.GetLogger("apiLogger");
         }
 
@@ -228,6 +231,7 @@ namespace KorepetycjeNaJuz.Controllers
             if (lesson.StudentId == currentUserId)
             {
                 _lessonService.RateLessonCoach(lessonRatingDTO);
+                _userService.CalculateCoachRating(lesson.CoachLesson.CoachId); // Aktualizacja pola CoachRating po nowej opinii
                 return Ok();
             }
             else if (lesson.CoachLesson.CoachId == currentUserId)

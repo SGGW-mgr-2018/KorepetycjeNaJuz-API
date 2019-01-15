@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using KorepetycjeNaJuz.Core.Enums;
+using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace KorepetycjeNaJuz.Core.Models
 {
@@ -31,6 +34,10 @@ namespace KorepetycjeNaJuz.Core.Models
         public bool CookiesConfirmed { get; set; }
 
         public bool PrivacyPolicesConfirmed { get; set; }
+
+        public float CoachRating { get; set; }
+
+        public virtual ICollection<CoachLesson> CoachLessonsAsTeacher { get; set; }
 
         public override bool Equals(object obj)
         {

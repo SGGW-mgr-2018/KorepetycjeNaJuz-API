@@ -13,5 +13,6 @@ namespace KorepetycjeNaJuz.Core.Interfaces
         Task<bool> IsUserExistsAsync(int id);
         Task<UserDTO> UpdateUserAsync(UserEditDTO userEditDTO);
         Task<bool> DeleteUserAsync(int id);
+        void CalculateCoachRating(int userId);
     }
 }

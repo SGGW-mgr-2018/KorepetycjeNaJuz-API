@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using NLog;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using KorepetycjeNaJuz.Core.Enums;
 
 namespace KorepetycjeNaJuz.Infrastructure.Services
 {
@@ -27,6 +29,42 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             this._mapper = mapper;
             this._userManager = userManager;
             this._logger = LogManager.GetLogger("apiLogger");
+        }
+
+        public void CalculateCoachRating(int userId)
+        {
+            _userRepository.DisableLazyLoading();
+
+            var user = _userRepository
+                .Query()
+                .Include(x => x.CoachLessonsAsTeacher)
+                    .ThenInclude((CoachLesson x) => x.Lessons)
+                .Where(x => x.Id == userId)
+                .FirstOrDefault();
+
+            var endedCoachLessons = user.CoachLessonsAsTeacher.Where(x => x.LessonStatusId == (int)LessonStatuses.Approved);
+            float rating = 0;
+            if (endedCoachLessons.Count() > 0)
+            {
+                int numberOfLessonWithRating = 0;
+                foreach (var coachLesson in endedCoachLessons)
+                {
+                    var lesson = coachLesson.Lessons.Where(x => x.LessonStatusId == (int)LessonStatuses.Approved && x.RatingOfCoach != null).FirstOrDefault();
+                    if (lesson != null)
+                    {
+                        numberOfLessonWithRating++;
+                        rating += (float)lesson.RatingOfCoach;
+                    }
+                }
+                if (numberOfLessonWithRating > 0)
+                {
+                    rating = rating / numberOfLessonWithRating;
+                }
+
+                user.CoachRating = rating;
+            }
+            _userRepository.SaveChanges();
+            _userRepository.EnableLazyLoading();
         }
 
         public async Task<bool> CreateUserAsync(UserCreateDTO userCreateDTO)
