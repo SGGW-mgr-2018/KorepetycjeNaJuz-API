@@ -89,7 +89,7 @@ namespace KorepetycjeNaJuz.Controllers
         {
             try
             {
-                var now = DateTime.Now.ToUniversalTime();
+                var now = DateTime.Now;
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
