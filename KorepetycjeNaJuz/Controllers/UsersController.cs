@@ -65,7 +65,7 @@ namespace KorepetycjeNaJuz.Controllers
         [HttpGet, Route("Get/{id}"), Authorize("Bearer")]
         public async Task<IActionResult> GetUser([FromRoute] int id)
         {
-            _logger.Info(string.Format("Entered GetUser({0}) method.", id));
+            _logger.Info(string.Format("Entered GetUser({0}) method. Czas DateTime.Now: {1}", id, DateTime.Now));
             if (!ModelState.IsValid || id == 0) // Użytkownik System
                 return BadRequest(ModelState);
 
