@@ -176,6 +176,9 @@ namespace KorepetycjeNaJuz.Infrastructure.Services
             if (filters.DateFrom == null)
                 filters.DateFrom = DateTime.Now;
 
+            if (filters.DateFrom < DateTime.Now)
+                filters.DateFrom = DateTime.Now;
+
             if (filters.DateTo == null)
                 filters.DateTo = filters.DateFrom.Value.AddDays(1);
 
