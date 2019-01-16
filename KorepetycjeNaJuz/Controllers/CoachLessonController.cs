@@ -140,6 +140,8 @@ namespace KorepetycjeNaJuz.Controllers
             }
 
             int currentUserID = this.User.GetUserId().Value;
+            coachLessonDTO.DateStart = coachLessonDTO.DateStart.Value.ToLocalTime();
+            coachLessonDTO.DateEnd = coachLessonDTO.DateEnd.Value.ToLocalTime();
             if (!_coachLessonService.IsTimeAvailable(currentUserID, coachLessonDTO.DateStart.Value, coachLessonDTO.DateEnd.Value))
             {
                 return StatusCode((int)HttpStatusCode.Conflict);
